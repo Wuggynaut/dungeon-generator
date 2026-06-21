@@ -1,0 +1,115 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generate > matches the pinned snapshot 1`] = `
+{
+  "denizens": {
+    "attitude": {
+      "columns": [
+        "Virtues",
+        "Vices",
+      ],
+      "left": {
+        "id": "denizens.attitude.left",
+        "value": "Suave",
+      },
+      "right": {
+        "id": "denizens.attitude.right",
+        "value": "Greedy",
+      },
+    },
+    "standoutNPC": {
+      "columns": [
+        "Virtues",
+        "Vices",
+      ],
+      "left": {
+        "id": "denizens.standoutNPC.left",
+        "value": "Deductive",
+      },
+      "right": {
+        "id": "denizens.standoutNPC.right",
+        "value": "Aloof",
+      },
+    },
+  },
+  "factions": [
+    {
+      "agenda": {
+        "columns": [
+          "Goal",
+          "Obstacle",
+        ],
+        "left": {
+          "id": "faction.0.agenda.left",
+          "value": "Protection",
+        },
+        "right": {
+          "id": "faction.0.agenda.right",
+          "value": "Incompetence",
+        },
+      },
+    },
+    {
+      "agenda": {
+        "columns": [
+          "Goal",
+          "Obstacle",
+        ],
+        "left": {
+          "id": "faction.1.agenda.left",
+          "value": "Innovation",
+        },
+        "right": {
+          "id": "faction.1.agenda.right",
+          "value": "Ignorance",
+        },
+      },
+    },
+  ],
+  "history": {
+    "construction": {
+      "columns": [
+        "Entrance",
+        "Composition",
+      ],
+      "left": {
+        "id": "history.construction.left",
+        "value": "Starlight Path",
+      },
+      "right": {
+        "id": "history.construction.right",
+        "value": "Earth",
+      },
+    },
+    "purpose": {
+      "columns": [
+        "Original Use",
+        "Built By",
+      ],
+      "left": {
+        "id": "history.purpose.left",
+        "value": "Bestial Creations",
+      },
+      "right": {
+        "id": "history.purpose.right",
+        "value": "A Secret Society",
+      },
+    },
+    "ruination": {
+      "columns": [
+        "Condition",
+        "Cause",
+      ],
+      "left": {
+        "id": "history.ruination.left",
+        "value": "Displaced",
+      },
+      "right": {
+        "id": "history.ruination.right",
+        "value": "Disease",
+      },
+    },
+  },
+  "seed": "test-seed",
+}
+`;
