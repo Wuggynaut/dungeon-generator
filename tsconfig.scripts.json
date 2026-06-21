@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/scripts.tsbuildinfo",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": true,
+    "types": ["node"]
+  },
+  "include": ["scripts", "src/**/*.ts"]
+}
