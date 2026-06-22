@@ -1,3 +1,5 @@
+import type {DungeonMap} from "./mapTypes.ts";
+
 export type PairedTable = {
     columns: [string, string];
     rows: [string, string][];
@@ -44,5 +46,5 @@ export type Dungeon = {
     denizens: Denizens;
     factions: Faction[];
     rooms: Room[];
-    // map to come
+    map: DungeonMap;
 };

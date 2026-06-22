@@ -3,6 +3,7 @@ import {makeChildRng, type Rng} from "./rng.ts";
 import {rollSlots} from "./rolls.ts";
 import {agendas, construction, purpose, ruination, traits} from "./tables.ts";
 import {defaultConfig} from "./config.ts";
+import {generateMap} from "./map.ts";
 
 function generateHistory (rng : Rng) : History {
     return {
@@ -53,11 +54,13 @@ export function generate(seed: string, config = defaultConfig): Dungeon {
     const denizens = generateDenizens(makeChildRng(seed, "denizens"));
     const factions = generateFactions(makeChildRng(seed, "factions"), config.factionCount);
     const rooms = generateRooms(makeChildRng(seed, "rooms"), config.roomTypes, config.roomCount);
+    const map = generateMap(makeChildRng(seed, "map"), rooms);
     return {
         seed,
         history,
         denizens,
         factions,
         rooms,
+        map,
     }
 }
