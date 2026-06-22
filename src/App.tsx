@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from "react";
 import {generate} from "./core/generate.ts";
 import {Section} from "./components/Section.tsx";
 import {RoomList} from "./components/RoomList.tsx";
+import {MapView} from "./components/MapView.tsx";
 
 function readSeedFromUrl(): string {
     return new URLSearchParams(window.location.search).get('seed') ?? "";
@@ -85,8 +86,8 @@ export default function App() {
             <RoomList rooms={dungeon.rooms} />
 
             <section>
-                <h2>Connections</h2>
-                <p>TBA</p>
+                <h2>Map</h2>
+                <MapView map={dungeon.map} rooms={dungeon.rooms} />
             </section>
         </div>
     )

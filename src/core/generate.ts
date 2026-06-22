@@ -41,7 +41,7 @@ export function pickRoomType(rng: Rng, pool: RoomType[]) : RoomType {
 
 function generateRooms(rng: Rng, pool: RoomType[], count: number): Room[] {
     const rooms: Room[] = [];
-    for (let id = 1; id < count; id++) {
+    for (let id = 1; id <= count; id++) {
         const rt = pickRoomType(rng, pool);
         const roll = rollSlots(rng, rt.table, `room.${id}`);
         rooms.push({ id, type: rt.name, roll });

@@ -7,7 +7,7 @@ export function RoomList({rooms}:{rooms:Room[]}){
             <h2>Rooms</h2>
             <ul>
                 {rooms.map((room:Room)=> (
-                    <li key={room.id}>
+                    <li key={room.id} id={`room-${room.id}`}>
                         <strong>#{room.id}: {room.type}</strong>
                         <RollView roll={room.roll} />
                     </li>

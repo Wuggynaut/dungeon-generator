@@ -4,8 +4,8 @@ import type {DungeonMap, MapEdge, MapNode, PathType, Point} from "../types/mapTy
 import { Delaunay } from "d3-delaunay";
 import type {Room} from "../types/rollTypes.ts";
 
-export const CANVAS_WIDTH = 600;
-export const CANVAS_HEIGHT = 600;
+export const CANVAS_WIDTH = 800;
+export const CANVAS_HEIGHT = 800;
 const DEGREE_CAP = 4;
 const LOOP_CHANCE = 0.3;
 const PATH_TYPE_WEIGHTS: { type: PathType; weight: number }[] = [
@@ -13,11 +13,12 @@ const PATH_TYPE_WEIGHTS: { type: PathType; weight: number }[] = [
     { type: "conditional", weight: 2 },
     { type: "hidden", weight: 1 },
 ];
+const PADDING = 40;
 
 type Edge = { a: number; b: number; length: number };
 
 export function placePoints(rng: Rng, count: number): Point[] {
-    const minDistance = Math.sqrt((CANVAS_WIDTH * CANVAS_HEIGHT) / count) * 0.7;
+    const minDistance = Math.sqrt((CANVAS_WIDTH * CANVAS_HEIGHT) / count) * 0.6;
 
     const sampler = new PoissonDiskSampling(
         {
@@ -172,10 +173,33 @@ export function pickPathType(rng: Rng): PathType {
     return PATH_TYPE_WEIGHTS[PATH_TYPE_WEIGHTS.length - 1].type; // safety net
 }
 
+function fitToCanvas(points: Point[], padding: number): Point[] {
+    const xs = points.map(p => p.x);
+    const ys = points.map(p => p.y);
+    const minX = Math.min(...xs);
+    const minY = Math.min(...ys);
+
+    const boxW = Math.max(...xs) - minX || 1;
+    const boxH = Math.max(...ys) - minY || 1;
+
+    const availW = CANVAS_WIDTH - padding * 2;
+    const availH = CANVAS_HEIGHT - padding * 2;
+
+    const scale = Math.min(availW / boxW, availH / boxH);
+
+    const offsetX = (CANVAS_WIDTH - boxW * scale) / 2;
+    const offsetY = (CANVAS_HEIGHT - boxH * scale) / 2;
+
+    return points.map(p => ({
+        x: (p.x - minX) * scale + offsetX,
+        y: (p.y - minY) * scale + offsetY,
+    }));
+}
+
 export function generateMap (rng: Rng, rooms: Room[]): DungeonMap {
     const count = rooms.length;
 
-    const points = placePoints(rng, count);
+    const points = fitToCanvas(placePoints(rng, count), PADDING);
     const candidates = candidateEdges(points);
     const tree = spanningTree(candidates, count);
     const edges = addLoops(tree, candidates, count, rng);
