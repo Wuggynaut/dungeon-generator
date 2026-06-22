@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { generate } from "./generate.ts";
+import {defaultConfig} from "./config.ts";
 
 describe("generate", () => {
     it("is deterministic: same seed yields an identical dungeon", () => {
@@ -12,7 +13,7 @@ describe("generate", () => {
 
     it("defaults to 2 factions and respects a custom count", () => {
         expect(generate("test-seed").factions).toHaveLength(2);
-        expect(generate("test-seed", 4).factions).toHaveLength(4);
+        expect(generate("test-seed", { ...defaultConfig, factionCount: 4 }).factions).toHaveLength(4);
     });
 
     it("stores the seed and gives every value a path-shaped slot id", () => {

@@ -110,6 +110,206 @@ exports[`generate > matches the pinned snapshot 1`] = `
       },
     },
   },
+  "rooms": [
+    {
+      "id": 1,
+      "roll": {
+        "columns": [
+          "Group",
+          "Activity",
+        ],
+        "left": {
+          "id": "room.1.left",
+          "value": "Plant",
+        },
+        "right": {
+          "id": "room.1.right",
+          "value": "Praying",
+        },
+      },
+      "type": "Monster",
+    },
+    {
+      "id": 2,
+      "roll": {
+        "columns": [
+          "Room Type",
+          "Clue",
+        ],
+        "left": {
+          "id": "room.2.left",
+          "value": "Barracks",
+        },
+        "right": {
+          "id": "room.2.right",
+          "value": "Draft",
+        },
+      },
+      "type": "Lore",
+    },
+    {
+      "id": 3,
+      "roll": {
+        "columns": [
+          "Room Type",
+          "Clue",
+        ],
+        "left": {
+          "id": "room.3.left",
+          "value": "Dining Hall",
+        },
+        "right": {
+          "id": "room.3.right",
+          "value": "Leavings",
+        },
+      },
+      "type": "Lore",
+    },
+    {
+      "id": 4,
+      "roll": {
+        "columns": [
+          "Room Type",
+          "Clue",
+        ],
+        "left": {
+          "id": "room.4.left",
+          "value": "Dining Hall",
+        },
+        "right": {
+          "id": "room.4.right",
+          "value": "Draft",
+        },
+      },
+      "type": "Lore",
+    },
+    {
+      "id": 5,
+      "roll": {
+        "columns": [
+          "Room Type",
+          "Clue",
+        ],
+        "left": {
+          "id": "room.5.left",
+          "value": "Latrine",
+        },
+        "right": {
+          "id": "room.5.right",
+          "value": "Footprints",
+        },
+      },
+      "type": "Lore",
+    },
+    {
+      "id": 6,
+      "roll": {
+        "columns": [
+          "Group",
+          "Activity",
+        ],
+        "left": {
+          "id": "room.6.left",
+          "value": "Extraplanar",
+        },
+        "right": {
+          "id": "room.6.right",
+          "value": "Growing",
+        },
+      },
+      "type": "Monster",
+    },
+    {
+      "id": 7,
+      "roll": {
+        "columns": [
+          "Trap",
+          "Trigger",
+        ],
+        "left": {
+          "id": "room.7.left",
+          "value": "Confuses",
+        },
+        "right": {
+          "id": "room.7.right",
+          "value": "Reading",
+        },
+      },
+      "type": "Trap",
+    },
+    {
+      "id": 8,
+      "roll": {
+        "columns": [
+          "Room Type",
+          "Clue",
+        ],
+        "left": {
+          "id": "room.8.left",
+          "value": "Shrine",
+        },
+        "right": {
+          "id": "room.8.right",
+          "value": "Paraphernalia",
+        },
+      },
+      "type": "Lore",
+    },
+    {
+      "id": 9,
+      "roll": {
+        "columns": [
+          "Room Type",
+          "Clue",
+        ],
+        "left": {
+          "id": "room.9.left",
+          "value": "Vault",
+        },
+        "right": {
+          "id": "room.9.right",
+          "value": "Noise",
+        },
+      },
+      "type": "Lore",
+    },
+    {
+      "id": 10,
+      "roll": {
+        "columns": [
+          "Group",
+          "Activity",
+        ],
+        "left": {
+          "id": "room.10.left",
+          "value": "Shape Shifter",
+        },
+        "right": {
+          "id": "room.10.right",
+          "value": "Sleeping",
+        },
+      },
+      "type": "Monster",
+    },
+    {
+      "id": 11,
+      "roll": {
+        "columns": [
+          "Group",
+          "Activity",
+        ],
+        "left": {
+          "id": "room.11.left",
+          "value": "Construct",
+        },
+        "right": {
+          "id": "room.11.right",
+          "value": "Recuperating",
+        },
+      },
+      "type": "Monster",
+    },
+  ],
   "seed": "test-seed",
 }
 `;

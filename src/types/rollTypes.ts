@@ -32,10 +32,17 @@ export type Faction = {
     agenda: Roll;
 };
 
+export type Room = {
+    id: number;
+    type: string;
+    roll: Roll
+};
+
 export type Dungeon = {
     seed: string;
     history: History;
     denizens: Denizens;
     factions: Faction[];
-    // rooms + map to come
+    rooms: Room[];
+    // map to come
 };

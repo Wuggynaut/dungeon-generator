@@ -1,4 +1,4 @@
-import type { PairedTable } from "../types.ts";
+import type { PairedTable } from "../types/rollTypes.ts";
 
 export function tokenizeTable(text: string): string[][] {
     return text

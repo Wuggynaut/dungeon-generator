@@ -1,4 +1,4 @@
-import type {PairedTable, Roll} from "../types.ts";
+import type {PairedTable, Roll} from "../types/rollTypes.ts";
 import type {Rng} from "./rng.ts";
 
 export function rollPaired(
