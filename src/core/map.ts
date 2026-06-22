@@ -14,6 +14,7 @@ const PATH_TYPE_WEIGHTS: { type: PathType; weight: number }[] = [
     { type: "hidden", weight: 1 },
 ];
 const PADDING = 40;
+const MAX_CUTOFF = 3;
 
 type Edge = { a: number; b: number; length: number };
 
@@ -196,6 +197,45 @@ function fitToCanvas(points: Point[], padding: number): Point[] {
     }));
 }
 
+function cutoffSizes(tree: Edge[], nodeCount: number, root: number): Map<string, number> {
+    const adj: number[][] = Array.from({ length: nodeCount }, () => []);
+    for (const e of tree) {
+        adj[e.a].push(e.b);
+        adj[e.b].push(e.a);
+    }
+
+    // BFS from the entrance, recording each node's parent and visit order
+    const parent = new Array<number>(nodeCount).fill(-1);
+    const order: number[] = [];
+    const visited = new Array<boolean>(nodeCount).fill(false);
+    const queue = [root];
+    visited[root] = true;
+    while (queue.length > 0) {
+        const node = queue.shift()!;
+        order.push(node);
+        for (const next of adj[node]) {
+            if (!visited[next]) {
+                visited[next] = true;
+                parent[next] = node;
+                queue.push(next);
+            }
+        }
+    }
+
+    const size = new Array<number>(nodeCount).fill(1);
+    for (let i = order.length - 1; i >= 0; i--) {
+        const node = order[i];
+        if (parent[node] !== -1) size[parent[node]] += size[node];
+    }
+
+    const sizes = new Map<string, number>();
+    for (const e of tree) {
+        const child = parent[e.a] === e.b ? e.a : e.b;
+        sizes.set(`${e.a}-${e.b}`, size[child]);
+    }
+    return sizes;
+}
+
 export function generateMap (rng: Rng, rooms: Room[]): DungeonMap {
     const count = rooms.length;
 
@@ -205,6 +245,17 @@ export function generateMap (rng: Rng, rooms: Room[]): DungeonMap {
     const edges = addLoops(tree, candidates, count, rng);
     const entranceIndex = findEntrance(points);
     const numbers = numberRooms(edges, count, entranceIndex);
+
+    // which edges are backbone vs. loop, and how much each backbone edge guards
+    const treeKeys = new Set(tree.map(e => `${e.a}-${e.b}`));
+    const cutoff = cutoffSizes(tree, count, entranceIndex);
+
+    const pathTypeFor = (edge: Edge): PathType => {
+        const key = `${edge.a}-${edge.b}`;
+        if (!treeKeys.has(key)) return pickPathType(rng);              // loop = alternate route
+        if (cutoff.get(key)! <= MAX_CUTOFF) return pickPathType(rng);  // small portion may be cut off
+        return "standard";                                              // backbone stays standard
+    };
 
     const roomIdOf = (index: number) => rooms[index].id;
 
@@ -220,7 +271,7 @@ export function generateMap (rng: Rng, rooms: Room[]): DungeonMap {
         mapEdges.push({
             a: roomIdOf(edge.a),
             b: roomIdOf(edge.b),
-            type: pickPathType(rng),
+            type: pathTypeFor(edge),
         });
     }
 

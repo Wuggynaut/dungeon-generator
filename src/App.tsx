@@ -14,10 +14,9 @@ function randomSeed(): string {
 
 export default function App() {
     const [seed, setSeed] = useState(() => readSeedFromUrl() || randomSeed());
-
     const [seedInput, setSeedInput] = useState(seed);
-
     const [notes, setNotes] = useState<Record<string, string>>({});
+    const [selected, setSelected] = useState<number | null>(null);
 
     const dungeon = useMemo(() => generate(seed), [seed]);
 
@@ -27,14 +26,20 @@ export default function App() {
         window.history.replaceState(null, "", `?${params}`);
     }, [seed]);
 
-    const handleGenerate = () => {
-        setSeed(seedInput);
-    };
+    // roomId -> display number (BFS order), shared by map and list
+    const numberByRoomId = useMemo(() => {
+        const m = new Map<number, number>();
+        for (const node of dungeon.map.nodes) m.set(node.roomId, node.number);
+        return m;
+    }, [dungeon]);
+
+    const handleGenerate = () => { setSeed(seedInput); setSelected(null); };
 
     const handleReroll = () => {
-        const next  = randomSeed();
+        const next = randomSeed();
         setSeedInput(next);
         setSeed(next);
+        setSelected(null);
     };
 
     const setNote = (id: string, text: string) => {
@@ -42,14 +47,14 @@ export default function App() {
     };
 
     return (
-        <div>
-            <input
-                value={seedInput}
-                onChange={e => setSeedInput(e.target.value)}
-            />
-            <button onClick={handleGenerate}>Generate</button>
-            <button onClick={handleReroll}>Reroll all</button>
+        <div style={{ padding: 16 }}>
+            <div style={{ marginBottom: 16 }}>
+                <input value={seedInput} onChange={e => setSeedInput(e.target.value)} />
+                <button onClick={handleGenerate}>Generate</button>
+                <button onClick={handleReroll}>Reroll all</button>
+            </div>
 
+            {/* full-width worksheet sections */}
             <Section
                 title="History"
                 prompt="Why was this dungeon built, how was it built, and what caused its downfall?"
@@ -71,7 +76,6 @@ export default function App() {
                 note={notes["notes.denizens"] ?? ""}
                 onNote={text => setNote("notes.denizens", text)}
             />
-
             <Section
                 title="Factions"
                 prompt="What is each faction trying to achieve, and what stands in their way?"
@@ -83,12 +87,25 @@ export default function App() {
                 onNote={text => setNote("notes.factions", text)}
             />
 
-            <RoomList rooms={dungeon.rooms} />
-
-            <section>
-                <h2>Map</h2>
-                <MapView map={dungeon.map} rooms={dungeon.rooms} />
-            </section>
+            {/* map and room list, side by side */}
+            <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+                <div style={{ flex: "0 0 520px" }}>
+                    <MapView
+                        map={dungeon.map}
+                        rooms={dungeon.rooms}
+                        selected={selected}
+                        onSelect={setSelected}
+                    />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <RoomList
+                        rooms={dungeon.rooms}
+                        numberByRoomId={numberByRoomId}
+                        selected={selected}
+                        onSelect={setSelected}
+                    />
+                </div>
+            </div>
         </div>
-    )
+    );
 }
