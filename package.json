@@ -10,13 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "d3-delaunay": "^6.0.4",
+    "poisson-disk-sampling": "^2.3.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "vitest": "^4.1.9"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/d3-delaunay": "^6.0.4",
     "@types/node": "^24.13.2",
+    "@types/poisson-disk-sampling": "^2.2.4",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
