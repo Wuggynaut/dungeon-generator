@@ -6,15 +6,24 @@ import type {Room} from "../types/rollTypes.ts";
 
 export const CANVAS_WIDTH = 800;
 export const CANVAS_HEIGHT = 800;
-const DEGREE_CAP = 4;
-const LOOP_CHANCE = 0.3;
 const PATH_TYPE_WEIGHTS: { type: PathType; weight: number }[] = [
-    { type: "standard", weight: 7 },
+    { type: "standard", weight: 8 },
     { type: "conditional", weight: 2 },
     { type: "hidden", weight: 1 },
 ];
+// Desired corridors-per-room. Weight = chance out of the total (8).
+const DEGREE_WEIGHTS: { degree: number; weight: number }[] = [
+    { degree: 1, weight: 2 },
+    { degree: 2, weight: 2 },
+    { degree: 3, weight: 3 },
+    { degree: 4, weight: 1 },
+];
+
 const PADDING = 40;
 const MAX_CUTOFF = 3;
+const GRID = 24;
+const NODE_CLEARANCE = 26;
+const MIN_CORRIDOR_ANGLE = 25;
 
 type Edge = { a: number; b: number; length: number };
 
@@ -33,6 +42,13 @@ export function placePoints(rng: Rng, count: number): Point[] {
 
     const raw = sampler.fill();
     return raw.slice(0, count).map(([x, y]) => ({x, y}));
+}
+
+function snapToGrid(points: Point[], grid: number): Point[] {
+    return points.map(p => ({
+        x: Math.round(p.x / grid) * grid,
+        y: Math.round(p.y / grid) * grid,
+    }));
 }
 
 function distance(p: Point, q: Point): number {
@@ -59,11 +75,24 @@ export function candidateEdges(points: Point[]): Edge[] {
     return edges;
 }
 
+function pickTargetDegree(rng: Rng): number {
+    const total = DEGREE_WEIGHTS.reduce((sum, e) => sum + e.weight, 0); // 8
+    let remaining = rng.int(total);
+    for (const e of DEGREE_WEIGHTS) {
+        if (remaining < e.weight) return e.degree;
+        remaining -= e.weight;
+    }
+    return DEGREE_WEIGHTS[DEGREE_WEIGHTS.length - 1].degree; // safety net
+}
+
 // Kruskal's algorithm
-export function spanningTree(edges: Edge[], nodeCount: number): Edge[] {
-    const sorted = [...edges].sort(
-        (x, y) => x.length - y.length || x.a - y.a || x.b - y.b,
-    );
+export function spanningTree(edges: Edge[], nodeCount: number, points: Point[]): Edge[] {
+    const sorted = [...edges].sort((x, y) => {
+        const gx = edgeGrazes(x, points) ? 1 : 0;
+        const gy = edgeGrazes(y, points) ? 1 : 0;
+        if (gx !== gy) return gx - gy;            // clean edges first
+        return x.length - y.length || x.a - y.a || x.b - y.b;
+    });
 
     const component = Array.from({ length: nodeCount }, (_, i) => i);
     const tree: Edge[] = [];
@@ -85,12 +114,78 @@ export function spanningTree(edges: Edge[], nodeCount: number): Edge[] {
     return tree;
 }
 
+function distanceToSegment(p: Point, a: Point, b: Point): number {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const lengthSq = dx * dx + dy * dy;
+    if (lengthSq === 0) return distance(p, a); // a and b are the same point
+
+    // how far along a→b the closest point lies, clamped to the segment
+    let t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / lengthSq;
+    t = Math.max(0, Math.min(1, t));
+
+    const closest = { x: a.x + t * dx, y: a.y + t * dy };
+    return distance(p, closest);
+}
+
+function edgeGrazes(edge: Edge, points: Point[]): boolean {
+    for (let i = 0; i < points.length; i++) {
+        if (i === edge.a || i === edge.b) continue; // skip the edge's own endpoints
+        if (distanceToSegment(points[i], points[edge.a], points[edge.b]) < NODE_CLEARANCE) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function angleBetween(vertex: Point, p: Point, q: Point): number {
+    const v1x = p.x - vertex.x;
+    const v1y = p.y - vertex.y;
+    const v2x = q.x - vertex.x;
+    const v2y = q.y - vertex.y;
+
+    const dot = v1x * v2x + v1y * v2y;
+    const len1 = Math.sqrt(v1x * v1x + v1y * v1y) || 1;
+    const len2 = Math.sqrt(v2x * v2x + v2y * v2y) || 1;
+
+    const cos = Math.max(-1, Math.min(1, dot / (len1 * len2)));
+    return Math.acos(cos) * (180 / Math.PI); // radians → degrees
+}
+
+// Would `edge` leave `room` at too sharp an angle to any corridor it already has?
+function tooSharpAt(
+    room: number,
+    edge: Edge,
+    existing: Edge[],
+    points: Point[],
+): boolean {
+    const farEnd = edge.a === room ? edge.b : edge.a;
+
+    for (const e of existing) {
+        // only corridors that touch this room
+        if (e.a !== room && e.b !== room) continue;
+        const otherEnd = e.a === room ? e.b : e.a;
+        if (otherEnd === farEnd) continue; // same corridor
+
+        if (angleBetween(points[room], points[farEnd], points[otherEnd]) < MIN_CORRIDOR_ANGLE) {
+            return true;
+        }
+    }
+    return false;
+}
+
 export function addLoops(
     tree: Edge[],
     candidates: Edge[],
     nodeCount: number,
     rng: Rng,
+    points: Point[],
 ): Edge[] {
+
+    const target = new Array<number>(nodeCount);
+    for (let i = 0; i < nodeCount; i++) target[i] = pickTargetDegree(rng);
+
+
     const degree = new Array<number>(nodeCount).fill(0);
     for (const edge of tree) {
         degree[edge.a]++;
@@ -100,18 +195,24 @@ export function addLoops(
     const inTree = new Set(tree.map(edge => `${edge.a}-${edge.b}`));
     const result = [...tree];
 
-    for (const edge of candidates) {
-        if (inTree.has(`${edge.a}-${edge.b}`)) continue; // already a corridor
 
-        const roll = rng.next();
-        const underCap =
-            degree[edge.a] < DEGREE_CAP && degree[edge.b] < DEGREE_CAP;
+    const ordered = [...candidates].sort((x, y) => x.length - y.length);
 
-        if (roll < LOOP_CHANCE && underCap) {
-            result.push(edge);
-            degree[edge.a]++;
-            degree[edge.b]++;
-        }
+    for (const edge of ordered) {
+        if (inTree.has(`${edge.a}-${edge.b}`)) continue;
+        if (edgeGrazes(edge, points)) continue;
+
+        const bothWantMore =
+            degree[edge.a] < target[edge.a] && degree[edge.b] < target[edge.b];
+        if (!bothWantMore) continue;
+
+        // reject if the edge makes a sharp wedge at either room it joins
+        if (tooSharpAt(edge.a, edge, result, points)) continue;
+        if (tooSharpAt(edge.b, edge, result, points)) continue;
+
+        result.push(edge);
+        degree[edge.a]++;
+        degree[edge.b]++;
     }
 
     return result;
@@ -239,10 +340,10 @@ function cutoffSizes(tree: Edge[], nodeCount: number, root: number): Map<string,
 export function generateMap (rng: Rng, rooms: Room[]): DungeonMap {
     const count = rooms.length;
 
-    const points = fitToCanvas(placePoints(rng, count), PADDING);
+    const points = snapToGrid(fitToCanvas(placePoints(rng, count), PADDING), GRID);
     const candidates = candidateEdges(points);
-    const tree = spanningTree(candidates, count);
-    const edges = addLoops(tree, candidates, count, rng);
+    const tree = spanningTree(candidates, count, points);
+    const edges = addLoops(tree, candidates, count, rng, points);
     const entranceIndex = findEntrance(points);
     const numbers = numberRooms(edges, count, entranceIndex);
 

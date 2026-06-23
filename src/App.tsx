@@ -106,6 +106,7 @@ export default function App() {
                     />
                 </div>
             </div>
+            <button onClick={handleReroll}>Reroll all</button>
         </div>
     );
 }
