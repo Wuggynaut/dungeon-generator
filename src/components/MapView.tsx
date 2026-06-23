@@ -2,6 +2,7 @@ import {CANVAS_WIDTH, CANVAS_HEIGHT, edgeSlotId} from "../core/map.ts";
 import { hashSeed } from "../core/rng.ts";
 import type {DungeonMap, MapNode, PathType, Point} from "../types/mapTypes.ts";
 import type {Room, SlotControls} from "../types/rollTypes.ts";
+import {useState} from "react";
 
 const PATH_STYLES: Record<PathType, { stroke: string; dash?: string; label: string }> = {
     standard:    { stroke: "#101010", label: "Standard" },
@@ -59,13 +60,14 @@ function nextPathType(current: PathType): PathType {
 }
 
 export function MapView({ map, rooms, selected, onSelect, controls }: MapViewProps) {
+    const [hoveredEdge, setHoveredEdge] = useState<string | null>(null);
+
     const nodeById = new Map<number, MapNode>();
     for (const node of map.nodes) nodeById.set(node.roomId, node);
 
     const typeById = new Map<number, string>();
     for (const room of rooms) typeById.set(room.id, room.type);
 
-    // distinct room types present, for the color legend
     const roomTypes = [...new Set(rooms.map(r => r.type))].sort();
 
     return (
@@ -80,18 +82,33 @@ export function MapView({ map, rooms, selected, onSelect, controls }: MapViewPro
                     const style = PATH_STYLES[edge.type];
                     const tick = edge.type === "conditional" ? tickMark(a, b, 8) : null;
                     const slotId = edgeSlotId(edge.a, edge.b);
+                    const isHovered = slotId === hoveredEdge;
 
                     return (
                         <g
                             key={`${edge.a}-${edge.b}`}
                             onClick={() => controls.edit(slotId, nextPathType(edge.type))}
+                            onMouseEnter={() => setHoveredEdge(slotId)}
+                            onMouseLeave={() => setHoveredEdge(null)}
                             style={{ cursor: "pointer" }}
                         >
+                            {/* hover highlight*/}
+                            {isHovered && (
+                                <line
+                                    x1={a.x} y1={a.y}
+                                    x2={b.x} y2={b.y}
+                                    stroke="#ee9f27"
+                                    strokeWidth={10}
+                                    strokeOpacity={0.5}
+                                    strokeLinecap="round"
+                                />
+                            )}
+                            {/* invisible hit area */}
                             <line
                                 x1={a.x} y1={a.y}
                                 x2={b.x} y2={b.y}
                                 stroke="transparent"
-                                strokeWidth={14}
+                                strokeWidth={44}
                             />
                             <line
                                 x1={a.x} y1={a.y}

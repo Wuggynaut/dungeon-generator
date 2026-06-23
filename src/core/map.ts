@@ -380,11 +380,12 @@ export function generateMap(rng: Rng, rooms: Room[], overrides: Overrides = {}):
     for (const edge of edges) {
         const a = roomIdOf(edge.a);
         const b = roomIdOf(edge.b);
+        const generated = pathTypeFor(edge);
         const override = overrides[edgeSlotId(a, b)]?.editValue;
         mapEdges.push({
             a,
             b,
-            type: isPathType(override) ? override : pathTypeFor(edge),
+            type: isPathType(override) ? override : generated,
         });
     }
 
