@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { generate } from "./core/generate.ts";
-import { defaultConfig } from "./core/config.ts";
+import {type Config, defaultConfig} from "./core/config.ts";
 import type { Overrides, SlotControls } from "./types/rollTypes.ts";
 import { Section } from "./components/Section.tsx";
 import { RoomList } from "./components/RoomList.tsx";
@@ -8,6 +8,9 @@ import { MapView } from "./components/MapView.tsx";
 import {decodeState, encodeState, fromJson, type ShareState, toJson} from "./core/share.ts";
 import {serializeMarkdown} from "./core/serialize.ts";
 import {marked} from "marked";
+import {serializeMapSvg} from "./core/serializeMap.ts";
+import {RoomTypeEditor} from "./components/RoomTypeEditor.tsx";
+import {ConfigEditor} from "./components/ConfigEditor.tsx";
 
 const PRINT_STYLES = `
     body { font-family: Georgia, serif; max-width: 40rem; margin: 2rem auto;
@@ -18,6 +21,7 @@ const PRINT_STYLES = `
     blockquote { border-left: 3px solid #999; margin: 0.5rem 0;
                  padding-left: 0.8rem; color: #333; font-style: italic; }
     ul { margin: 0.3rem 0; }
+    svg { max-width: 100%; height: auto; border: 1px solid #999; }
 `;
 
 function randomSeed(): string {
@@ -34,7 +38,7 @@ function readInitialState(): ShareState {
     }
 
     const seed = params.get("seed"); // fall back to old ?seed= links
-    return { seed: seed || randomSeed(), overrides: {}, notes: {} };
+    return { seed: seed || randomSeed(), config: defaultConfig, overrides: {}, notes: {} };
 }
 
 function downloadFile(filename: string, mime: string, contents: string) {
@@ -54,16 +58,17 @@ export default function App() {
     const [overrides, setOverrides] = useState<Overrides>(initial.overrides);
     const [notes, setNotes] = useState<Record<string, string>>(initial.notes);
     const [selected, setSelected] = useState<number | null>(null);
+    const [config, setConfig] = useState<Config>(initial.config);
 
     const dungeon = useMemo(
-        () => generate(seed, defaultConfig, overrides),
-        [seed, overrides],
+        () => generate(seed, config, overrides),
+        [seed, config, overrides],
     );
 
     useEffect(() => {
-        const encoded = encodeState({ seed, overrides, notes });
+        const encoded = encodeState({ seed, config, overrides, notes });
         window.history.replaceState(null, "", `?d=${encoded}`);
-    }, [seed, overrides, notes]);
+    }, [seed, config, overrides, notes]);
 
     const numberByRoomId = useMemo(() => {
         const m = new Map<number, number>();
@@ -108,6 +113,7 @@ export default function App() {
     const applyState = (state: ShareState) => {
         setSeed(state.seed);
         setSeedInput(state.seed);
+        setConfig(state.config);   // new
         setOverrides(state.overrides);
         setNotes(state.notes);
         setSelected(null);
@@ -118,7 +124,8 @@ export default function App() {
     };
 
     const handleExport = () => {
-        downloadFile(`dungeon-${seed}.json`, "application/json", toJson({ seed, overrides, notes }));
+        downloadFile(`dungeon-${seed}.json`, "application/json",
+            toJson({ seed, config, overrides, notes }));
     };
 
     const handleExportMarkdown = () => {
@@ -140,9 +147,10 @@ export default function App() {
 
     const handlePrint = () => {
         const html = marked.parse(serializeMarkdown(dungeon, notes)) as string;
+        const svg = serializeMapSvg(dungeon);
 
         const win = window.open("", "_blank");
-        if (!win) return; // popup was blocked
+        if (!win) return;
 
         win.document.write(`
         <!DOCTYPE html>
@@ -151,7 +159,11 @@ export default function App() {
                 <title>Dungeon ${seed}</title>
                 <style>${PRINT_STYLES}</style>
             </head>
-            <body>${html}</body>
+            <body>
+                <h2>Map</h2>
+                ${svg}
+                ${html}
+            </body>
         </html>
     `);
         win.document.close();
@@ -182,6 +194,9 @@ export default function App() {
                     <button onClick={handlePrint}>Print</button>
                 </p>
             </div>
+
+            <ConfigEditor config={config} onChange={setConfig} />
+            <RoomTypeEditor config={config} onChange={setConfig} />
 
             <Section
                 title="History"

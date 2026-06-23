@@ -58,7 +58,13 @@ function distance(p: Point, q: Point): number {
 }
 
 export function candidateEdges(points: Point[]): Edge[] {
-    const delaunay = Delaunay.from(points, (p: Point)  => p.x, (p: Point) => p.y);
+    if (points.length < 3) {
+        return points.length === 2
+            ? [{ a: 0, b: 1, length: distance(points[0], points[1]) }]
+            : [];
+    }
+
+    const delaunay = Delaunay.from(points, (p: Point) => p.x, (p: Point) => p.y);
     const seen = new Set<string>();
     const edges: Edge[] = [];
 

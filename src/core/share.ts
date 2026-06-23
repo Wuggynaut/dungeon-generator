@@ -1,12 +1,23 @@
 import type {Overrides} from "../types/rollTypes.ts";
 import {compressToEncodedURIComponent, decompressFromEncodedURIComponent} from "lz-string";
+import {type Config, defaultConfig} from "./config.ts";
 
-// To be added: config
 export type ShareState = {
-  seed: string;
-  overrides: Overrides;
-  notes: Record<string, string>;
+    seed: string;
+    config: Config;
+    overrides: Overrides;
+    notes: Record<string, string>;
 };
+
+function isConfig(value: unknown): value is Config {
+    if (typeof value !== "object" || value === null) return false;
+    const c = value as Record<string, unknown>;
+    return (
+        typeof c.roomCount === "number" &&
+        typeof c.factionCount === "number" &&
+        Array.isArray(c.roomTypes)
+    );
+}
 
 function normalize(raw: unknown): ShareState | null {
     if (typeof raw !== "object" || raw === null) return null;
@@ -14,6 +25,7 @@ function normalize(raw: unknown): ShareState | null {
     if (typeof obj.seed !== "string") return null;
     return {
         seed: obj.seed,
+        config: isConfig(obj.config) ? obj.config : defaultConfig,
         overrides: (obj.overrides as Overrides) ?? {},
         notes: (obj.notes as Record<string, string>) ?? {},
     };
