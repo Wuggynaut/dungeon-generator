@@ -1,7 +1,7 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "../core/map.ts";
+import {CANVAS_WIDTH, CANVAS_HEIGHT, edgeSlotId} from "../core/map.ts";
 import { hashSeed } from "../core/rng.ts";
 import type {DungeonMap, MapNode, PathType, Point} from "../types/mapTypes.ts";
-import type { Room } from "../types/rollTypes.ts";
+import type {Room, SlotControls} from "../types/rollTypes.ts";
 
 const PATH_STYLES: Record<PathType, { stroke: string; dash?: string; label: string }> = {
     standard:    { stroke: "#101010", label: "Standard" },
@@ -23,6 +23,7 @@ type MapViewProps = {
     rooms: Room[];
     selected: number | null;
     onSelect: (roomId: number) => void;
+    controls: SlotControls;
 };
 
 function colorForType(type: string): string {
@@ -51,7 +52,13 @@ function tickMark(a: Point, b: Point, half: number) {
     };
 }
 
-export function MapView({ map, rooms, selected, onSelect }: MapViewProps) {
+function nextPathType(current: PathType): PathType {
+    const order: PathType[] = ["standard", "conditional", "hidden"];
+    const i = order.indexOf(current);
+    return order[(i + 1) % order.length];
+}
+
+export function MapView({ map, rooms, selected, onSelect, controls }: MapViewProps) {
     const nodeById = new Map<number, MapNode>();
     for (const node of map.nodes) nodeById.set(node.roomId, node);
 
@@ -72,9 +79,20 @@ export function MapView({ map, rooms, selected, onSelect }: MapViewProps) {
                     const b = nodeById.get(edge.b)!;
                     const style = PATH_STYLES[edge.type];
                     const tick = edge.type === "conditional" ? tickMark(a, b, 8) : null;
+                    const slotId = edgeSlotId(edge.a, edge.b);
 
                     return (
-                        <g key={`${edge.a}-${edge.b}`}>
+                        <g
+                            key={`${edge.a}-${edge.b}`}
+                            onClick={() => controls.edit(slotId, nextPathType(edge.type))}
+                            style={{ cursor: "pointer" }}
+                        >
+                            <line
+                                x1={a.x} y1={a.y}
+                                x2={b.x} y2={b.y}
+                                stroke="transparent"
+                                strokeWidth={14}
+                            />
                             <line
                                 x1={a.x} y1={a.y}
                                 x2={b.x} y2={b.y}

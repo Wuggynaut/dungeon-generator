@@ -183,6 +183,7 @@ export default function App() {
                         rooms={dungeon.rooms}
                         selected={selected}
                         onSelect={setSelected}
+                        controls={controls}
                     />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>

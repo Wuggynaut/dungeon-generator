@@ -86,7 +86,7 @@ export function generate(
     const denizens = generateDenizens(seed, overrides);
     const factions = generateFactions(seed, config.factionCount, overrides);
     const rooms = generateRooms(seed, config.roomTypes, config.roomCount, overrides);
-    const map = generateMap(makeChildRng(seed, "map"), rooms);
+    const map = generateMap(makeChildRng(seed, "map"), rooms, overrides);
 
     return { seed, history, denizens, factions, rooms, map };
 }
