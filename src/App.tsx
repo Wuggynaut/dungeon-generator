@@ -6,6 +6,19 @@ import { Section } from "./components/Section.tsx";
 import { RoomList } from "./components/RoomList.tsx";
 import { MapView } from "./components/MapView.tsx";
 import {decodeState, encodeState, fromJson, type ShareState, toJson} from "./core/share.ts";
+import {serializeMarkdown} from "./core/serialize.ts";
+import {marked} from "marked";
+
+const PRINT_STYLES = `
+    body { font-family: Georgia, serif; max-width: 40rem; margin: 2rem auto;
+           color: #000; line-height: 1.5; }
+    h1 { font-size: 1.6rem; border-bottom: 2px solid #000; padding-bottom: 0.3rem; }
+    h2 { font-size: 1.2rem; margin-top: 1.5rem; border-bottom: 1px solid #999; }
+    h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+    blockquote { border-left: 3px solid #999; margin: 0.5rem 0;
+                 padding-left: 0.8rem; color: #333; font-style: italic; }
+    ul { margin: 0.3rem 0; }
+`;
 
 function randomSeed(): string {
     return Math.random().toString(36).slice(2, 10);
@@ -22,6 +35,16 @@ function readInitialState(): ShareState {
 
     const seed = params.get("seed"); // fall back to old ?seed= links
     return { seed: seed || randomSeed(), overrides: {}, notes: {} };
+}
+
+function downloadFile(filename: string, mime: string, contents: string) {
+    const blob = new Blob([contents], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 export default function App() {
@@ -95,16 +118,11 @@ export default function App() {
     };
 
     const handleExport = () => {
-        const text = toJson({ seed, overrides, notes });
-        const blob = new Blob([text], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
+        downloadFile(`dungeon-${seed}.json`, "application/json", toJson({ seed, overrides, notes }));
+    };
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `dungeon-${seed}.json`;
-        a.click();
-
-        URL.revokeObjectURL(url);
+    const handleExportMarkdown = () => {
+        downloadFile(`dungeon-${seed}.md`, "text/markdown", serializeMarkdown(dungeon, notes));
     };
 
     const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,6 +136,26 @@ export default function App() {
         }
         applyState(state);
         e.target.value = "";
+    };
+
+    const handlePrint = () => {
+        const html = marked.parse(serializeMarkdown(dungeon, notes)) as string;
+
+        const win = window.open("", "_blank");
+        if (!win) return; // popup was blocked
+
+        win.document.write(`
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Dungeon ${seed}</title>
+                <style>${PRINT_STYLES}</style>
+            </head>
+            <body>${html}</body>
+        </html>
+    `);
+        win.document.close();
+        win.print();
     };
 
     return (
@@ -138,6 +176,10 @@ export default function App() {
                             style={{ display: "none" }}
                         />
                     </label>
+                </p>
+                <p>
+                    <button onClick={handleExportMarkdown}>Export Markdown</button>
+                    <button onClick={handlePrint}>Print</button>
                 </p>
             </div>
 
