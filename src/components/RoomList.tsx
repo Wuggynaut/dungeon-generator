@@ -1,4 +1,4 @@
-import type { Room } from "../types/rollTypes.ts";
+import type { Room, SlotControls } from "../types/rollTypes.ts";
 import RollView from "./RollView.tsx";
 
 type RoomListProps = {
@@ -6,9 +6,10 @@ type RoomListProps = {
     numberByRoomId: Map<number, number>;
     selected: number | null;
     onSelect: (roomId: number) => void;
+    controls: SlotControls;
 };
 
-export function RoomList({ rooms, numberByRoomId, selected, onSelect }: RoomListProps) {
+export function RoomList({ rooms, numberByRoomId, selected, onSelect, controls }: RoomListProps) {
     const ordered = [...rooms].sort(
         (a, b) => (numberByRoomId.get(a.id) ?? 0) - (numberByRoomId.get(b.id) ?? 0),
     );
@@ -28,8 +29,18 @@ export function RoomList({ rooms, numberByRoomId, selected, onSelect }: RoomList
                             background: room.id === selected ? "#dbeafe" : "transparent",
                         }}
                     >
-                        <strong>#{numberByRoomId.get(room.id)}: {room.type}</strong>
-                        <RollView roll={room.roll} />
+                        <div>
+                            <strong>#{numberByRoomId.get(room.id)}: {room.type}</strong>{" "}
+                            <button
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    controls.reroll(`room.${room.id}.type`);
+                                }}
+                            >
+                                Reroll type
+                            </button>
+                        </div>
+                        <RollView roll={room.roll} controls={controls} />
                     </li>
                 ))}
             </ul>

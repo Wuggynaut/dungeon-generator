@@ -1,20 +1,59 @@
-import type {PairedTable, Roll} from "../types/rollTypes.ts";
-import type {Rng} from "./rng.ts";
+import type {Overrides, PairedTable, Roll} from "../types/rollTypes.ts";
+import {makeChildRng} from "./rng.ts";
 
-export function rollPaired(
-    rng: Rng,
+const MAX_REROLL_TRIES = 50;
+
+function rolledValue(
+    seed: string,
     table: PairedTable,
-): { left: string; right: string } {
-    const left = table.rows[rng.int(table.rows.length)][0];
-    const right = table.rows[rng.int(table.rows.length)][1];
-    return { left, right };
+    slotId: string,
+    column: 0 | 1,
+    count: number,
+): string {
+    const label = count > 0 ? `${slotId}#${count}` : slotId;
+    const rng = makeChildRng(seed, label);
+
+    if (count === 0) {
+        return table.rows[rng.int(table.rows.length)][column];
+    }
+
+    const previous = rolledValue(seed, table, slotId, column, count - 1);
+
+    for (let i = 0; i < MAX_REROLL_TRIES; i++) {
+        const candidate = table.rows[rng.int(table.rows.length)][column];
+        if (candidate !== previous) return candidate;
+    }
+    return previous; // give up: e.g. the column has only one distinct value
 }
 
-export function rollSlots(rng: Rng, table: PairedTable, baseId: string): Roll {
-    const { left, right } = rollPaired(rng, table);
-    return {
-        columns : table.columns,
-        left : {id : baseId + ".left", value: left },
-        right : {id : baseId + ".right", value: right},
+function valueFor(
+    seed: string,
+    table: PairedTable,
+    slotId: string,
+    column: 0 | 1,
+    overrides: Overrides,
+): string {
+    const override = overrides[slotId];
+
+    if (override?.editValue !== undefined) {
+        return override.editValue;
     }
+
+    const count = override?.rerollCount ?? 0;
+    return rolledValue(seed, table, slotId, column, count);
+}
+
+export function rollSlots(
+    seed: string,
+    table: PairedTable,
+    baseId: string,
+    overrides: Overrides = {},
+): Roll {
+    const leftId = `${baseId}.left`;
+    const rightId = `${baseId}.right`;
+    return {
+        columns: table.columns,
+        left:  { id: leftId,  value: valueFor(seed, table, leftId, 0, overrides) },
+        right: { id: rightId, value: valueFor(seed, table, rightId, 1, overrides) },
+    };
 }

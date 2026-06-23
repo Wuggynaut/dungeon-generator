@@ -11,7 +11,19 @@ export type RoomType = {
     table: PairedTable;
 };
 
+export type SlotOverride = {
+    rerollCount?: number;  // how many times the user has rerolled this slot
+    editValue?: string;    // a value the user typed by hand
+};
+
+export type Overrides = Record<string, SlotOverride>;
+
 export type Slot = { id: string; value: string };
+
+export type SlotControls = {
+    reroll: (slotId: string) => void;
+    edit: (slotId: string, value: string) => void;
+};
 
 export type Roll = {
     columns: [string, string]; //labels copies from the source table
