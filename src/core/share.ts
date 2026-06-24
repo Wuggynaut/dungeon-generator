@@ -1,6 +1,6 @@
-import type {Overrides} from "../types/rollTypes.ts";
-import {compressToEncodedURIComponent, decompressFromEncodedURIComponent} from "lz-string";
-import {type Config, defaultConfig} from "./config.ts";
+import type { Overrides, PairedTable, RoomType } from "../types/rollTypes.ts";
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from "lz-string";
+import { type Config, defaultConfig, type Tables } from "./config.ts";
 
 export type ShareState = {
     seed: string;
@@ -9,14 +9,39 @@ export type ShareState = {
     notes: Record<string, string>;
 };
 
-function isConfig(value: unknown): value is Config {
+function isPairedTable(value: unknown): value is PairedTable {
     if (typeof value !== "object" || value === null) return false;
-    const c = value as Record<string, unknown>;
+    const t = value as Record<string, unknown>;
     return (
-        typeof c.roomCount === "number" &&
-        typeof c.factionCount === "number" &&
-        Array.isArray(c.roomTypes)
+        Array.isArray(t.columns) &&
+        t.columns.length === 2 &&
+        t.columns.every(c => typeof c === "string") &&
+        Array.isArray(t.rows) &&
+        t.rows.every(r => Array.isArray(r) && r.length === 2 && r.every(c => typeof c === "string"))
     );
+}
+
+function normalizeTables(value: unknown): Tables {
+    const v = (typeof value === "object" && value !== null ? value : {}) as Record<string, unknown>;
+    const pick = (key: keyof Tables): PairedTable =>
+        isPairedTable(v[key]) ? (v[key] as PairedTable) : defaultConfig.tables[key];
+    return {
+        purpose: pick("purpose"),
+        construction: pick("construction"),
+        ruination: pick("ruination"),
+        traits: pick("traits"),
+        agendas: pick("agendas"),
+    };
+}
+
+function normalizeConfig(value: unknown): Config {
+    const c = (typeof value === "object" && value !== null ? value : {}) as Record<string, unknown>;
+    return {
+        roomCount: typeof c.roomCount === "number" ? c.roomCount : defaultConfig.roomCount,
+        factionCount: typeof c.factionCount === "number" ? c.factionCount : defaultConfig.factionCount,
+        roomTypes: Array.isArray(c.roomTypes) ? (c.roomTypes as RoomType[]) : defaultConfig.roomTypes,
+        tables: normalizeTables(c.tables),
+    };
 }
 
 function normalize(raw: unknown): ShareState | null {
@@ -25,7 +50,7 @@ function normalize(raw: unknown): ShareState | null {
     if (typeof obj.seed !== "string") return null;
     return {
         seed: obj.seed,
-        config: isConfig(obj.config) ? obj.config : defaultConfig,
+        config: normalizeConfig(obj.config),
         overrides: (obj.overrides as Overrides) ?? {},
         notes: (obj.notes as Record<string, string>) ?? {},
     };
