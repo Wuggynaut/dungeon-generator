@@ -1,0 +1,15 @@
+.heading { margin: 0 0 var(--space-1); }
+.note { margin: 0 0 var(--space-2); color: var(--color-muted); font-size: 13px; }
+
+.tables { display: flex; flex-direction: column; }
+
+/* each collapsible table is a separated row, matching the room-type list */
+.details { border-top: 1px solid var(--color-border); }
+.details:last-child { border-bottom: 1px solid var(--color-border); }
+
+.summary { cursor: pointer; padding: var(--space-2) 0; }
+.summaryRow { display: inline-flex; align-items: baseline; gap: var(--space-2); }
+.summaryTitle { font-weight: 600; }
+.summaryMeta { font-size: 13px; color: var(--color-muted); }
+
+.detailsBody { padding: 0 0 var(--space-6); }

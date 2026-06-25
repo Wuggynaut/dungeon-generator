@@ -4,8 +4,8 @@ import type {DungeonMap, MapEdge, MapNode, PathType, Point} from "../types/mapTy
 import { Delaunay } from "d3-delaunay";
 import type {Overrides, Room} from "../types/rollTypes.ts";
 
-export const CANVAS_WIDTH = 800;
-export const CANVAS_HEIGHT = 800;
+export const CANVAS_WIDTH = 1080;
+export const CANVAS_HEIGHT = 720;
 const PATH_TYPE_WEIGHTS: { type: PathType; weight: number }[] = [
     { type: "standard", weight: 8 },
     { type: "conditional", weight: 2 },
@@ -13,8 +13,8 @@ const PATH_TYPE_WEIGHTS: { type: PathType; weight: number }[] = [
 ];
 // Desired corridors-per-room. Weight = chance out of the total (8).
 const DEGREE_WEIGHTS: { degree: number; weight: number }[] = [
-    { degree: 1, weight: 2 },
-    { degree: 2, weight: 2 },
+    { degree: 1, weight: 1 },
+    { degree: 2, weight: 3 },
     { degree: 3, weight: 3 },
     { degree: 4, weight: 1 },
 ];
@@ -370,7 +370,7 @@ export function generateMap(rng: Rng, rooms: Room[], overrides: Overrides = {}):
         const key = `${edge.a}-${edge.b}`;
         if (!treeKeys.has(key)) return pickPathType(rng);              // loop = alternate route
         if (cutoff.get(key)! <= MAX_CUTOFF) return pickPathType(rng);  // small portion may be cut off
-        return "standard";                                              // backbone stays standard
+        return "standard";
     };
 
     const roomIdOf = (index: number) => rooms[index].id;

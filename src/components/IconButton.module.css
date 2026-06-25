@@ -1,0 +1,37 @@
+.iconButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--color-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    line-height: 0;
+    touch-action: manipulation;  /* removes the 300ms tap delay on mobile */
+}
+
+.iconButton svg {
+    width: 16px;
+    height: 16px;
+}
+
+.iconButton:hover:not(:disabled) {
+    background: none;
+}
+
+.iconButton:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .iconButton:hover svg [data-part="body"] {
+        fill: var(--color-purple);
+        stroke: var(--color-purple);
+    }
+    .iconButton:hover svg [data-part="detail"] {
+        stroke: #fff;
+    }
+}

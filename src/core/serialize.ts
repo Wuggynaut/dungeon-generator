@@ -50,6 +50,7 @@ function roomsSection(dungeon: Dungeon): string {
         const body = [
             `- ${room.roll.columns[0]}: ${room.roll.left.value}`,
             `- ${room.roll.columns[1]}: ${room.roll.right.value}`,
+            ...(room.monster ? [`- Monster: ${room.monster.value}`] : []),
             `- Connections: ${links || "none"}`,
         ].join("\n");
 
@@ -85,7 +86,9 @@ export function serializeMarkdown(dungeon: Dungeon, notes: Notes = {}): string {
     blocks.push(section(
         "Factions",
         "What is each faction trying to achieve, and what stands in their way?",
-        dungeon.factions.map((f, i) => rollLine(`Faction ${i + 1}`, f.agenda)),
+        dungeon.factions.map((f, i) =>
+            `${rollLine(`Faction ${i + 1}`, f.agenda)} (Group: ${f.group.value})`
+        ),
         noteBlock(notes, "notes.factions"),
     ));
 

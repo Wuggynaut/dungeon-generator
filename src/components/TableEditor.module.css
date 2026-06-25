@@ -1,0 +1,84 @@
+.wrap {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.table th,
+.table td {
+    border-bottom: 1px solid var(--color-border);
+    padding: 2px 4px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.table thead th {
+    border-bottom: 2px solid var(--color-border);
+}
+
+/* narrow utility columns */
+.handleCol { width: 24px; }
+.numCol,
+.num {
+    width: 28px;
+    text-align: right;
+    padding-right: var(--space-2);
+    color: var(--color-muted);
+}
+.actionCol { width: 32px; text-align: center; }
+
+/* inputs are invisible until focused */
+.cellInput,
+.headInput {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+}
+.headInput { font-weight: 600; }
+
+.cellInput:focus,
+.headInput:focus {
+    outline: 2px solid var(--color-purple);
+    outline-offset: -2px;
+    background: #fff;
+}
+
+/* drag handle */
+.handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-muted);
+    cursor: grab;
+    line-height: 0;
+}
+.handle:hover { color: var(--color-purple); }
+.handle:active { cursor: grabbing; }
+.handle svg { width: 16px; height: 16px; }
+
+.dragging { opacity: 0.4; }
+
+/* add-row button */
+.addRow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+    padding: 4px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    cursor: pointer;
+}
+.addRow:hover { color: var(--color-purple); border-color: var(--color-purple); }
+.addIcon { width: 14px; height: 14px; }

@@ -1,4 +1,4 @@
-import type {Overrides, PairedTable, Roll} from "../types/rollTypes.ts";
+import type {Overrides, PairedTable, Roll, Slot} from "../types/rollTypes.ts";
 import {makeChildRng} from "./rng.ts";
 
 const MAX_REROLL_TRIES = 50;
@@ -56,4 +56,39 @@ export function rollSlots(
         left:  { id: leftId,  value: valueFor(seed, table, leftId, 0, overrides) },
         right: { id: rightId, value: valueFor(seed, table, rightId, 1, overrides) },
     };
+}
+
+function rolledFromList(
+    seed: string,
+    options: string[],
+    slotId: string,
+    count: number,
+): string {
+    const label = count > 0 ? `${slotId}#${count}` : slotId;
+    const rng = makeChildRng(seed, label);
+
+    if (count === 0) {
+        return options[rng.int(options.length)];
+    }
+
+    const previous = rolledFromList(seed, options, slotId, count - 1);
+    for (let i = 0; i < MAX_REROLL_TRIES; i++) {
+        const candidate = options[rng.int(options.length)];
+        if (candidate !== previous) return candidate;
+    }
+    return previous;
+}
+
+export function rollOne(
+    seed: string,
+    options: string[],
+    slotId: string,
+    overrides: Overrides = {},
+): Slot {
+    const override = overrides[slotId];
+    if (override?.editValue !== undefined) {
+        return { id: slotId, value: override.editValue };
+    }
+    const count = override?.rerollCount ?? 0;
+    return { id: slotId, value: rolledFromList(seed, options, slotId, count) };
 }

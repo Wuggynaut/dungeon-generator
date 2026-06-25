@@ -43,13 +43,15 @@ export type Denizens = {
 };
 
 export type Faction = {
+    group: Slot;
     agenda: Roll;
 };
 
 export type Room = {
     id: number;
     type: string;
-    roll: Roll
+    roll: Roll;
+    monster?: Slot; // specific monster; only set for rooms whose group is in the bestiary
 };
 
 export type Dungeon = {

@@ -17,15 +17,7 @@ const ROOM_COLORS: Record<string, string> = {
     Trap:    "#da6922", // raspberry
 };
 
-const NODE_RADIUS = 16;
-
-type MapViewProps = {
-    map: DungeonMap;
-    rooms: Room[];
-    selected: number | null;
-    onSelect: (roomId: number) => void;
-    controls: SlotControls;
-};
+const NODE_RADIUS = 14;
 
 function colorForType(type: string): string {
     if (type in ROOM_COLORS) return ROOM_COLORS[type];
@@ -59,7 +51,16 @@ function nextPathType(current: PathType): PathType {
     return order[(i + 1) % order.length];
 }
 
-export function MapView({ map, rooms, selected, onSelect, controls }: MapViewProps) {
+type MapViewProps = {
+    map: DungeonMap;
+    rooms: Room[];
+    selected: number | null;
+    onSelect: (roomId: number) => void;
+    controls: SlotControls;
+    onRerollAll: () => void;
+};
+
+export function MapView({ map, rooms, selected, onSelect, controls, onRerollAll }: MapViewProps) {
     const [hoveredEdge, setHoveredEdge] = useState<string | null>(null);
 
     const nodeById = new Map<number, MapNode>();
@@ -74,8 +75,15 @@ export function MapView({ map, rooms, selected, onSelect, controls }: MapViewPro
         <div>
             <svg
                 viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
-                style={{ width: "100%", maxWidth: 600, border: "1px solid #ccc" }}
+                style={{ width: "100%", border: "1px solid var(--color-border)" }}
             >
+                <defs>
+                    <pattern id="dot-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+                        <circle cx="12" cy="12" r="1.4" fill="#382e2f" fill-opacity="0.15"/>
+                    </pattern>
+                </defs>
+                <rect width="1400" height="1400" fill="#ffffff"/>
+                <rect width="1400" height="1400" fill="url(#dot-grid)"/>
                 {map.edges.map(edge => {
                     const a = nodeById.get(edge.a)!;
                     const b = nodeById.get(edge.b)!;
@@ -133,12 +141,33 @@ export function MapView({ map, rooms, selected, onSelect, controls }: MapViewPro
                     const isEntrance = node.roomId === map.entrance;
                     const isSelected = node.roomId === selected;
 
-                    // arrow sits above the node, but flips below if the node is near the top edge
+                    // entrance arrow points at the room from whichever wall is nearest
+                    const gapToLeft = node.x;
+                    const gapToRight = CANVAS_WIDTH - node.x;
+                    const gapToTop = node.y;
+                    const gapToBottom = CANVAS_HEIGHT - node.y;
+                    const nearest = Math.min(gapToLeft, gapToRight, gapToTop, gapToBottom);
+
+                    // (dx, dy) points from the nearest wall toward the room
+                    let dx = 0, dy = 0;
+                    if (nearest === gapToLeft) dx = 1;
+                    else if (nearest === gapToRight) dx = -1;
+                    else if (nearest === gapToTop) dy = 1;
+                    else dy = -1;
+
                     const gap = NODE_RADIUS + 3;
-                    const pointsDown = node.y >= CANVAS_HEIGHT / 2;
-                    const tipY = pointsDown ? node.y - gap : node.y + gap;
-                    const baseY = pointsDown ? tipY - 10 : tipY + 10;
-                    const arrow = `${node.x},${tipY} ${node.x - 7},${baseY} ${node.x + 7},${baseY}`;
+                    const len = 14;
+                    const half = 9;
+                    const tipX = node.x - dx * gap;
+                    const tipY = node.y - dy * gap;
+                    const baseX = tipX - dx * len;
+                    const baseY = tipY - dy * len;
+                    const perpX = -dy;
+                    const perpY = dx;
+                    const arrow =
+                        `${tipX},${tipY} ` +
+                        `${baseX + perpX * half},${baseY + perpY * half} ` +
+                        `${baseX - perpX * half},${baseY - perpY * half}`;
 
                     return (
                         <g
@@ -173,45 +202,53 @@ export function MapView({ map, rooms, selected, onSelect, controls }: MapViewPro
 
             {/* legend */}
 
-            <div style={{ marginTop: 12, fontSize: 13 }}>
-                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 8 }}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                        <svg width={14} height={12}>
-                            <polygon points="1,2 13,2 7,11" fill="#000" />
-                        </svg>
-                        Entrance
-                    </span>
-                    {Object.entries(PATH_STYLES).map(([type, style]) => (
-                        <span key={type} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                            <svg width={28} height={10}>
-                                <line
-                                    x1={0} y1={5} x2={28} y2={5}
-                                    stroke={style.stroke}
-                                    strokeWidth={2}
-                                    strokeDasharray={style.dash}
-                                />
-                                {type === "conditional" && (
-                                    <line x1={14} y1={1} x2={14} y2={9} stroke={style.stroke} strokeWidth={2} />
-                                )}
+            <div style={{
+                marginTop: 12,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 16,
+                flexWrap: "wrap",
+            }}>
+                {/* legend wrapper: stacks both rows so the button centers across both */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 13 }}>
+                    {/* row 1: entrance + path types */}
+                    <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                            <svg width={14} height={12} style={{ flex: "none" }}>
+                                <polygon points="1,2 13,2 7,11" fill="#000" />
                             </svg>
-                                                {style.label}
+                            Entrance
                         </span>
-                    ))}
+                        {Object.entries(PATH_STYLES).map(([type, style]) => (
+                            <span key={type} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                                <svg width={28} height={10} style={{ flex: "none" }}>
+                                    <line x1={0} y1={5} x2={28} y2={5} stroke={style.stroke}
+                                          strokeWidth={2} strokeDasharray={style.dash} />
+                                    {type === "conditional" && (
+                                        <line x1={14} y1={1} x2={14} y2={9} stroke={style.stroke} strokeWidth={2} />
+                                    )}
+                                </svg>
+                                {style.label}
+                            </span>
+                        ))}
+                    </div>
+
+                    {/* row 2: room types */}
+                    <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+                        {roomTypes.map(type => (
+                            <span key={type} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                                <span style={{
+                                    width: 12, height: 12, borderRadius: "50%",
+                                    background: colorForType(type), display: "inline-block", flex: "none",
+                                }} />
+                                {type}
+                            </span>
+                        ))}
+                    </div>
                 </div>
-                <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-                    {roomTypes.map(type => (
-                        <span key={type} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                            <span style={{
-                                width: 12,
-                                height: 12,
-                                borderRadius: "50%",
-                                background: colorForType(type),
-                                display: "inline-block",
-                            }} />
-                            {type}
-                        </span>
-                    ))}
-                </div>
+
+                <button className="primary" onClick={onRerollAll}>Reroll all</button>
             </div>
         </div>
     );

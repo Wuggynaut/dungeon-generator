@@ -1,5 +1,9 @@
 import { useState } from "react";
-import type { Roll, SlotControls } from "../types/rollTypes.ts";
+import type { Roll, Slot, SlotControls } from "../types/rollTypes.ts";
+import { IconButton } from "./IconButton.tsx";
+import { DiceIcon } from "./icons/DiceIcon.tsx";
+import { EditIcon } from "./icons/EditIcon.tsx";
+import styles from "./RollView.module.css";
 
 type CellProps = {
     label: string;
@@ -34,29 +38,40 @@ function Cell({ label, slotId, value, controls }: CellProps) {
     }
 
     return (
-        <div>
-            <strong>{label}:</strong> {value}{" "}
-            <button onClick={() => controls.reroll(slotId)}>Reroll</button>
-            <button onClick={startEdit}>Edit</button>
+        <div className={styles.cell}>
+            <span className={styles.text}>
+                <strong>{label}:</strong> {value}
+            </span>
+            <span className={styles.actions}>
+                <IconButton label="Reroll" onClick={() => controls.reroll(slotId)}>
+                    <DiceIcon />
+                </IconButton>
+                <IconButton label="Edit" onClick={startEdit}>
+                    <EditIcon />
+                </IconButton>
+            </span>
         </div>
     );
 }
 
-export default function RollView({ roll, controls }: { roll: Roll; controls: SlotControls }) {
+export default function RollView({
+                                     roll,
+                                     controls,
+                                     layout = "spread",
+                                     extra,
+                                 }: {
+    roll: Roll;
+    controls: SlotControls;
+    layout?: "spread" | "compact";
+    extra?: { label: string; slot: Slot };
+}) {
     return (
-        <div>
-            <Cell
-                label={roll.columns[0]}
-                slotId={roll.left.id}
-                value={roll.left.value}
-                controls={controls}
-            />
-            <Cell
-                label={roll.columns[1]}
-                slotId={roll.right.id}
-                value={roll.right.value}
-                controls={controls}
-            />
+        <div className={layout === "compact" ? styles.compact : undefined}>
+            <Cell label={roll.columns[0]} slotId={roll.left.id} value={roll.left.value} controls={controls} />
+            <Cell label={roll.columns[1]} slotId={roll.right.id} value={roll.right.value} controls={controls} />
+            {extra && (
+                <Cell label={extra.label} slotId={extra.slot.id} value={extra.slot.value} controls={controls} />
+            )}
         </div>
     );
 }

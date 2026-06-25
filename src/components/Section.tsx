@@ -1,7 +1,8 @@
-import type {Roll, SlotControls} from "../types/rollTypes.ts";
+import type {Roll, Slot, SlotControls} from "../types/rollTypes.ts";
 import RollView from "./RollView.tsx";
+import styles from "./Section.module.css";
 
-type LabeledRoll = { label: string; roll: Roll };
+type LabeledRoll = { label: string; roll: Roll; extra?: { label: string; slot: Slot } };
 
 type SectionProps = {
     title: string;
@@ -19,8 +20,8 @@ export function Section({ title, prompt, items, note, onNote, controls }: Sectio
             <p><i>{prompt}</i></p>
             {items.map(item => (
                 <div key={item.roll.left.id}>
-                    <h3>{item.label}</h3>
-                    <RollView roll={item.roll} controls={controls} />
+                    <h3 className={styles.itemTitle}>{item.label}</h3>
+                    <RollView roll={item.roll} controls={controls} layout="compact" extra={item.extra} />
                 </div>
             ))}
             <textarea
@@ -31,3 +32,4 @@ export function Section({ title, prompt, items, note, onNote, controls }: Sectio
         </section>
     );
 }
+

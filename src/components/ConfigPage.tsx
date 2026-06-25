@@ -1,7 +1,8 @@
-import type {Config, Tables} from "../core/config.ts";
-import type {PairedTable} from "../types/rollTypes.ts";
-import {RoomTypeEditor} from "./RoomTypeEditor.tsx";
-import {TableEditor} from "./TableEditor.tsx";
+import type { Config, Tables } from "../core/config.ts";
+import type { PairedTable } from "../types/rollTypes.ts";
+import { RoomTypeEditor } from "./RoomTypeEditor.tsx";
+import { TableEditor } from "./TableEditor.tsx";
+import styles from "./ConfigPage.module.css";
 
 type ConfigPageProps = {
     config: Config;
@@ -16,37 +17,44 @@ const FIXED_TABLES: { key: keyof Tables; title: string }[] = [
     { key: "agendas", title: "Agendas" },
 ];
 
-export function ConfigPage({config, onChange}: ConfigPageProps) {
+export function ConfigPage({ config, onChange }: ConfigPageProps) {
     const setTable = (key: keyof Tables, table: PairedTable) => {
-        onChange({...config, tables: {...config.tables, [key]: table}});
+        onChange({ ...config, tables: { ...config.tables, [key]: table } });
     };
 
     return (
-        <div>
-            <RoomTypeEditor config={config} onChange={onChange} />
+        <>
+            <section>
+                <RoomTypeEditor config={config} onChange={onChange} />
+            </section>
 
             <section>
-                <h2>Core Tables</h2>
-                <p style={{ color: "#666", fontSize: 13 }}>
+                <h2 className={styles.heading}>Core tables</h2>
+                <p className={styles.note}>
                     These feed History, Denizens, and Factions. Editing them changes what each seed rolls.
                 </p>
-                {FIXED_TABLES.map(({ key, title }) => {
-                    const table = config.tables[key];
-                    return (
-                        <details key={key} style={{ marginBottom: 8 }}>
-                            <summary style={{ cursor: "pointer" }}>
-                                {title}{" "}
-                                <span style={{ color: "#666" }}>
-                                    ({table.columns[0]} × {table.columns[1]}, {table.rows.length} rows)
-                                </span>
-                            </summary>
-                            <div style={{ marginTop: 8 }}>
-                                <TableEditor table={table} onChange={t => setTable(key, t)} />
-                            </div>
-                        </details>
-                    );
-                })}
+
+                <div className={styles.tables}>
+                    {FIXED_TABLES.map(({ key, title }) => {
+                        const table = config.tables[key];
+                        return (
+                            <details key={key} className={styles.details}>
+                                <summary className={styles.summary}>
+                                    <span className={styles.summaryRow}>
+                                        <span className={styles.summaryTitle}>{title}</span>
+                                        <span className={styles.summaryMeta}>
+                                            {table.columns[0]} × {table.columns[1]} · {table.rows.length} rows
+                                        </span>
+                                    </span>
+                                </summary>
+                                <div className={styles.detailsBody}>
+                                    <TableEditor table={table} onChange={t => setTable(key, t)} />
+                                </div>
+                            </details>
+                        );
+                    })}
+                </div>
             </section>
-        </div>
-    )
+        </>
+    );
 }

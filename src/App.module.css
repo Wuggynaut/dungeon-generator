@@ -1,0 +1,109 @@
+.app { min-height: 100vh; }
+
+/* sticky header bar */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+.headerInner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+.title {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    color: var(--color-purple);
+    margin: 0;
+}
+
+/* tabs */
+.tabs { display: flex; gap: var(--space-1); }
+.tab { background: transparent; border-color: transparent; }
+.tabActive {
+    background: var(--color-purple);
+    border-color: var(--color-purple);
+    color: #fff;
+}
+/* keep the active tab purple even on hover */
+.tab.tabActive:hover {
+    background: var(--color-purple);
+    color: #fff;
+}
+
+/* page body */
+.main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+}
+
+/* toolbar card */
+.toolbar {
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: center;
+    justify-content: center;
+}
+.seedRow, .buttonGroup {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* a <label> styled to match buttons for file input etc */
+.fileButton {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    cursor: pointer;
+}
+.fileButton:hover { background: var(--color-mauve); border-color: var(--color-accent); }
+
+/* purple "primary" buttons for the main actions */
+.primary {
+    background: var(--color-purple);
+    border-color: var(--color-purple);
+    color: #fff;
+}
+.primary:hover:not(:disabled) {
+    background: var(--color-purple);
+    border-color: var(--color-purple);
+    opacity: 0.9;
+}
+
+.panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: var(--space-4);
+}
+
+.panel > section,
+.panel > .mapBlock {
+    background: none;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.panel > :first-child {
+    border-top: none;
+}

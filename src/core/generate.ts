@@ -1,6 +1,7 @@
 import type { Denizens, Dungeon, Faction, History, Overrides, PairedTable, Room, RoomType } from "../types/rollTypes.ts";
 import { makeChildRng, type Rng } from "./rng.ts";
-import { rollSlots } from "./rolls.ts";
+import { rollSlots, rollOne } from "./rolls.ts";
+import {groupNames, monstersByGroup} from "./monsters.ts";
 import { type Config, defaultConfig, type Tables } from "./config.ts";
 import { generateMap } from "./map.ts";
 
@@ -24,7 +25,10 @@ function generateDenizens(seed: string, tables: Tables, overrides: Overrides): D
 function generateFactions(seed: string, agendas: PairedTable, count: number, overrides: Overrides): Faction[] {
     const factions: Faction[] = [];
     for (let i = 0; i < count; i++) {
-        factions.push({ agenda: rollSlots(seed, agendas, `faction.${i}.agenda`, overrides) });
+        factions.push({
+            group: rollOne(seed, groupNames, `faction.${i}.group`, overrides),
+            agenda: rollSlots(seed, agendas, `faction.${i}.agenda`, overrides),
+        });
     }
     return factions;
 }
@@ -60,7 +64,14 @@ function generateRooms(seed: string, pool: RoomType[], count: number, overrides:
         const typeCount = overrides[`room.${id}.type`]?.rerollCount ?? 0;
         const rt = roomTypeAtCount(seed, pool, id, typeCount);
         const roll = rollSlots(seed, rt.table, `room.${id}`, overrides);
-        rooms.push({ id, type: rt.name, roll });
+        const room: Room = { id, type: rt.name, roll };
+
+        const options = monstersByGroup[roll.left.value];
+        if (options) {
+            room.monster = rollOne(seed, options, `room.${id}.monster`, overrides);
+        }
+
+        rooms.push(room);
     }
     return rooms;
 }
