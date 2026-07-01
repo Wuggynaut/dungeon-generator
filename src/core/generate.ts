@@ -1,11 +1,12 @@
 import type { Denizens, Dungeon, Faction, History, Overrides, PairedTable, Room, RoomType } from "../types/rollTypes.ts";
-import { makeChildRng, type Rng } from "./rng.ts";
+import {makeChildRng, pickWeighted, type Rng} from "./rng.ts";
 import { rollSlots, rollOne } from "./rolls.ts";
-import {groupNames, monstersByGroup} from "./monsters.ts";
+import {groupNames, monstersByGroup} from "./data/monsters.ts";
 import { type Config, defaultConfig, type Tables } from "./config.ts";
 import { generateMap } from "./map.ts";
 
 const MAX_TYPE_REROLL_TRIES = 50;
+const UNALIGNED_WEIGHT = 1; // How likely a monster room belongs to no faction, relative to one faction's strength
 
 function generateHistory(seed: string, tables: Tables, overrides: Overrides): History {
     return {
@@ -27,10 +28,30 @@ function generateFactions(seed: string, agendas: PairedTable, count: number, ove
     for (let i = 0; i < count; i++) {
         factions.push({
             group: rollOne(seed, groupNames, `faction.${i}.group`, overrides),
+            strength: 1,
             agenda: rollSlots(seed, agendas, `faction.${i}.agenda`, overrides),
         });
     }
     return factions;
+}
+
+// Returns a faction index, or null for the unaligned remainder.
+function sampleOccupantIndex(
+    seed: string,
+    roomId: number,
+    factions: Faction[],
+    count: number,
+): number | null {
+    const label = count > 0 ? `room.${roomId}.occupant#${count}` : `room.${roomId}.occupant`;
+    const rng = makeChildRng(seed, label);
+
+    const total = factions.reduce((sum, f) => sum + f.strength, 0) + UNALIGNED_WEIGHT;
+    let r = rng.int(total);
+    for (let i = 0; i < factions.length; i++) {
+        if (r < factions[i].strength) return i;
+        r -= factions[i].strength;
+    }
+    return null; // fell into the unaligned slice
 }
 
 function roomTypeAtCount(seed: string, pool: RoomType[], roomId: number, count: number): RoomType {
@@ -49,16 +70,16 @@ function roomTypeAtCount(seed: string, pool: RoomType[], roomId: number, count: 
 }
 
 export function pickRoomType(rng: Rng, pool: RoomType[]): RoomType {
-    const totalWeight = pool.reduce((sum, rt) => sum + rt.weight, 0);
-    let remaining = rng.int(totalWeight);
-    for (const rt of pool) {
-        if (remaining < rt.weight) return rt;
-        remaining -= rt.weight;
-    }
-    return pool[pool.length - 1];
+    return pickWeighted(rng, pool);
 }
 
-function generateRooms(seed: string, pool: RoomType[], count: number, overrides: Overrides): Room[] {
+function generateRooms(
+    seed: string,
+    pool: RoomType[],
+    count: number,
+    overrides: Overrides,
+    factions: Faction[],
+): Room[] {
     const rooms: Room[] = [];
     for (let id = 1; id <= count; id++) {
         const typeCount = overrides[`room.${id}.type`]?.rerollCount ?? 0;
@@ -66,11 +87,25 @@ function generateRooms(seed: string, pool: RoomType[], count: number, overrides:
         const roll = rollSlots(seed, rt.table, `room.${id}`, overrides);
         const room: Room = { id, type: rt.name, roll };
 
-        const options = monstersByGroup[roll.left.value];
-        if (options) {
-            room.monster = rollOne(seed, options, `room.${id}.monster`, overrides);
+        // Only the monster table produces known group names in its left column.
+        const isMonsterRoom = monstersByGroup[roll.left.value] !== undefined;
+        if (isMonsterRoom) {
+            const leftOverride = overrides[`room.${id}.left`];
+            // A hand-typed group wins outright; otherwise the occupant decides.
+            if (leftOverride?.editValue === undefined) {
+                const rerollCount = leftOverride?.rerollCount ?? 0;
+                const idx = sampleOccupantIndex(seed, id, factions, rerollCount);
+                if (idx !== null) {
+                    roll.left.value = factions[idx].group.value;  // inherit the faction's group
+                    room.occupantFaction = idx;
+                }
+                // idx === null -> unaligned, leave the normally-rolled group in place
+            }
+            const roster = monstersByGroup[roll.left.value];
+            if (roster) {
+                room.monster = rollOne(seed, roster, `room.${id}.monster`, overrides);
+            }
         }
-
         rooms.push(room);
     }
     return rooms;
@@ -80,7 +115,7 @@ export function generate(seed: string, config: Config = defaultConfig, overrides
     const history = generateHistory(seed, config.tables, overrides);
     const denizens = generateDenizens(seed, config.tables, overrides);
     const factions = generateFactions(seed, config.tables.agendas, config.factionCount, overrides);
-    const rooms = generateRooms(seed, config.roomTypes, config.roomCount, overrides);
+    const rooms = generateRooms(seed, config.roomTypes, config.roomCount, overrides, factions);
     const map = generateMap(makeChildRng(seed, "map"), rooms, overrides);
 
     return { seed, history, denizens, factions, rooms, map };

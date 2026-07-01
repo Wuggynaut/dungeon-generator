@@ -49,3 +49,16 @@ export function makeRng(seed: number): Rng {
     };
 }
 
+export function pickWeighted<T extends {weight: number}>(rng: Rng, pool: T[]): T {
+    const totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
+    let remaining = rng.int(totalWeight);
+    for (const item of pool) {
+        if (remaining < item.weight) return item;
+        remaining -= item.weight;
+    }
+    return pool[pool.length - 1];
+}
+
+export function randomSeed(): string {
+    return Math.random().toString(36).slice(2, 10);
+}

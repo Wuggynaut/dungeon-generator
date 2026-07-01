@@ -44,6 +44,7 @@ export type Denizens = {
 
 export type Faction = {
     group: Slot;
+    strength: number;
     agenda: Roll;
 };
 
@@ -52,6 +53,7 @@ export type Room = {
     type: string;
     roll: Roll;
     monster?: Slot; // specific monster; only set for rooms whose group is in the bestiary
+    occupantFaction?: number; // index into dungeon.factions; absent = unaligned or non-monster room
 };
 
 export type Dungeon = {
@@ -62,3 +64,5 @@ export type Dungeon = {
     rooms: Room[];
     map: DungeonMap;
 };
+
+export type NameType = "npcName" | "properNoun" | "hidden";

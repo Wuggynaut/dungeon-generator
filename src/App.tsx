@@ -12,6 +12,7 @@ import { serializeMapSvg } from "./core/serializeMap.ts";
 import { ConfigPage } from "./components/ConfigPage.tsx";
 import {ConfigEditor} from "./components/ConfigEditor.tsx";
 import styles from "./App.module.css";
+import NameGeneratorPage from "./components/NameGeneratorPage.tsx";
 
 const PRINT_STYLES = `
     body { font-family: Georgia, serif; max-width: 40rem; margin: 2rem auto;
@@ -24,6 +25,14 @@ const PRINT_STYLES = `
     ul { margin: 0.3rem 0; }
     svg { max-width: 100%; height: auto; border: 1px solid #999; }
 `;
+
+const TABS = [
+    { id: "worksheet", label: "Worksheet" },
+    { id: "setup", label: "Setup" },
+    { id: "names", label: "Names" },
+] as const;
+
+type ViewId = typeof TABS[number]["id"];
 
 function randomSeed(): string {
     return Math.random().toString(36).slice(2, 10);
@@ -58,7 +67,7 @@ export default function App() {
     const [notes, setNotes] = useState<Record<string, string>>(initial.notes);
     const [selected, setSelected] = useState<number | null>(null);
     const [config, setConfig] = useState<Config>(initial.config);
-    const [view, setView] = useState<"worksheet" | "setup">("worksheet");
+    const [view, setView] = useState<ViewId>("worksheet");
 
     const dungeon = useMemo(
         () => generate(seed, config, overrides),
@@ -162,97 +171,95 @@ export default function App() {
                 <div className={styles.headerInner}>
                     <h1 className={styles.title}>Dungeon Seeds</h1>
                     <nav className={styles.tabs}>
-                        <button
-                            className={`${styles.tab} ${view === "worksheet" ? styles.tabActive : ""}`}
-                            onClick={() => setView("worksheet")}
-                        >
-                            Worksheet
-                        </button>
-                        <button
-                            className={`${styles.tab} ${view === "setup" ? styles.tabActive : ""}`}
-                            onClick={() => setView("setup")}
-                        >
-                            Setup
-                        </button>
+                        {TABS.map(tab => (
+                            <button
+                                key={tab.id}
+                                className={`${styles.tab} ${view === tab.id ? styles.tabActive : ""}`}
+                                onClick={() => setView(tab.id)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
                     </nav>
                 </div>
             </header>
 
             <main className={styles.main}>
-                {view === "setup" ? (
+                {view === "setup" && (
                     <div className={styles.panel}>
                         <ConfigPage config={config} onChange={setConfig} />
                     </div>
-                ) : (
-                    <>
-
-
-                        <div className={styles.panel}>
-                            <div className={styles.toolbar}>
-                                <div className={styles.seedRow}>
-                                    <input value={seedInput} onChange={e => setSeedInput(e.target.value)} />
-                                    <button className="primary" onClick={handleGenerate}>Generate</button>
-                                    <button className="primary" onClick={handleReroll}>Reroll all</button>
-                                </div>
-                                <div className={styles.buttonGroup}>
-                                    <button onClick={handleCopyLink}>Copy link</button>
-                                    <button onClick={handleExport}>Export JSON</button>
-                                    <label className={styles.fileButton}>
-                                        Import JSON
-                                        <input type="file" accept="application/json"
-                                               onChange={handleImport} style={{ display: "none" }} />
-                                    </label>
-                                    <button onClick={handleExportMarkdown}>Export Markdown</button>
-                                    <button onClick={handlePrint}>Print</button>
-                                </div>
+                )}
+                {view === "names" && (
+                    <div className={styles.panel}>
+                        <NameGeneratorPage/>
+                    </div>
+                )}
+                {view === "worksheet" && (
+                    <div className={styles.panel}>
+                        <div className={styles.toolbar}>
+                            <div className={styles.seedRow}>
+                                <input value={seedInput} onChange={e => setSeedInput(e.target.value)} />
+                                <button className="primary" onClick={handleGenerate}>Generate</button>
+                                <button className="primary" onClick={handleReroll}>Reroll all</button>
                             </div>
-                            <ConfigEditor config={config} onChange={setConfig} />
-                            <Section
-                                title="History"
-                                prompt="Why was this dungeon built, how was it built, and what caused its downfall?"
-                                items={[
-                                    { label: "Purpose", roll: dungeon.history.purpose },
-                                    { label: "Construction", roll: dungeon.history.construction },
-                                    { label: "Ruination", roll: dungeon.history.ruination },
-                                ]}
-                                note={notes["notes.history"] ?? ""}
-                                onNote={text => setNote("notes.history", text)}
-                                controls={controls}
-                            />
-                            <Section
-                                title="Denizens"
-                                prompt="What do we know about the creatures and factions that occupy the dungeon?"
-                                items={[
-                                    { label: "General attitude", roll: dungeon.denizens.attitude },
-                                    { label: "Standout NPC", roll: dungeon.denizens.standoutNPC },
-                                ]}
-                                note={notes["notes.denizens"] ?? ""}
-                                onNote={text => setNote("notes.denizens", text)}
-                                controls={controls}
-                            />
-                            <Section
-                                title="Factions"
-                                prompt="What is each faction trying to achieve, and what stands in their way?"
-                                items={dungeon.factions.map((faction, index) => ({
-                                    label: `Faction ${index + 1}`,
-                                    roll: faction.agenda,
-                                    extra: { label: "Group", slot: faction.group },
-                                }))}
-                                note={notes["notes.factions"] ?? ""}
-                                onNote={text => setNote("notes.factions", text)}
-                                controls={controls}
-                            />
-
-                            <div className={styles.mapBlock}>
-                                <MapView map={dungeon.map} rooms={dungeon.rooms}
-                                         selected={selected} onSelect={setSelected}
-                                         controls={controls} onRerollAll={handleReroll} />
+                            <div className={styles.buttonGroup}>
+                                <button onClick={handleCopyLink}>Copy link</button>
+                                <button onClick={handleExport}>Export JSON</button>
+                                <label className={styles.fileButton}>
+                                    Import JSON
+                                    <input type="file" accept="application/json"
+                                           onChange={handleImport} style={{ display: "none" }} />
+                                </label>
+                                <button onClick={handleExportMarkdown}>Export Markdown</button>
+                                <button onClick={handlePrint}>Print</button>
                             </div>
-                            <RoomList rooms={dungeon.rooms} numberByRoomId={numberByRoomId}
-                                      selected={selected} onSelect={setSelected} controls={controls} />
                         </div>
+                        <ConfigEditor config={config} onChange={setConfig} />
+                        <Section
+                            title="History"
+                            prompt="Why was this dungeon built, how was it built, and what caused its downfall?"
+                            items={[
+                                { label: "Purpose", roll: dungeon.history.purpose },
+                                { label: "Construction", roll: dungeon.history.construction },
+                                { label: "Ruination", roll: dungeon.history.ruination },
+                            ]}
+                            note={notes["notes.history"] ?? ""}
+                            onNote={text => setNote("notes.history", text)}
+                            controls={controls}
+                        />
+                        <Section
+                            title="Denizens"
+                            prompt="What do we know about the creatures and factions that occupy the dungeon?"
+                            items={[
+                                { label: "General attitude", roll: dungeon.denizens.attitude },
+                                { label: "Standout NPC", roll: dungeon.denizens.standoutNPC },
+                            ]}
+                            note={notes["notes.denizens"] ?? ""}
+                            onNote={text => setNote("notes.denizens", text)}
+                            controls={controls}
+                        />
+                        <Section
+                            title="Factions"
+                            prompt="What is each faction trying to achieve, and what stands in their way?"
+                            items={dungeon.factions.map((faction, index) => ({
+                                label: `Faction ${index + 1}`,
+                                roll: faction.agenda,
+                                extra: { label: "Group", slot: faction.group },
+                            }))}
+                            note={notes["notes.factions"] ?? ""}
+                            onNote={text => setNote("notes.factions", text)}
+                            controls={controls}
+                        />
 
-                    </>
+                        <div className={styles.mapBlock}>
+                            <MapView map={dungeon.map} rooms={dungeon.rooms}
+                                     selected={selected} onSelect={setSelected}
+                                     controls={controls} onRerollAll={handleReroll} />
+                        </div>
+                        <RoomList rooms={dungeon.rooms} numberByRoomId={numberByRoomId}
+                                  selected={selected} onSelect={setSelected} controls={controls} />
+                    </div>
                 )}
             </main>
         </div>

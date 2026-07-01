@@ -1,5 +1,5 @@
 // AUTO-GENERATED from Dungeon_Seeds.md by build-tables.ts. Do not edit by hand.
-import type { PairedTable, RoomType } from "../types/rollTypes.ts";
+import type { PairedTable, RoomType } from "../../types/rollTypes.ts";
 
 export const purpose: PairedTable = {
     columns: ["Original Use", "Built By"],

@@ -51,6 +51,7 @@ function roomsSection(dungeon: Dungeon): string {
             `- ${room.roll.columns[0]}: ${room.roll.left.value}`,
             `- ${room.roll.columns[1]}: ${room.roll.right.value}`,
             ...(room.monster ? [`- Monster: ${room.monster.value}`] : []),
+            ...(room.occupantFaction !== undefined ? [`- Held by: Faction ${room.occupantFaction + 1}`] : []),
             `- Connections: ${links || "none"}`,
         ].join("\n");
 

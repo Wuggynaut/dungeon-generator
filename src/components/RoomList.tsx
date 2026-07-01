@@ -43,6 +43,11 @@ export function RoomList({ rooms, numberByRoomId, selected, onSelect, controls }
                                 </IconButton>
                             </span>
                         </div>
+                        {room.occupantFaction !== undefined && (
+                            <div style={{ fontSize: "0.85em", opacity: 0.8 }}>
+                                Faction: {room.occupantFaction + 1}
+                            </div>
+                        )}
                         <RollView
                             roll={room.roll}
                             controls={controls}

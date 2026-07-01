@@ -1,5 +1,5 @@
 import type {PairedTable, RoomType} from "../types/rollTypes.ts";
-import {defaultRoomTypes, purpose, construction, ruination, traits, agendas} from "./tables.ts";
+import {defaultRoomTypes, purpose, construction, ruination, traits, agendas} from "./data/tables.ts";
 
 export type Tables = {
     purpose: PairedTable;
