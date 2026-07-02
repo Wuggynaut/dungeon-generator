@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {generateName} from "../core/names.ts";
 import {randomSeed} from "../core/rng.ts";
-import {german} from "../core/data/languages.ts";
+import {german, vainan} from "../core/data/languages.ts";
 
 export default function NameGeneratorPage() {
     const [nameList, setNameList] = useState<string[]>([]);
