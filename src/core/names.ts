@@ -1,73 +1,125 @@
 import {makeChildRng, pickWeighted, type Rng} from "./rng.ts";
+import type {LanguagePhonology, Phoneme, SyllablePortion} from "./data/languages.ts";
 
-const consonants = ["p", "b", "t", "d", "k", "g", "f", "v", "w", "s", "z", "h", "m", "n", "l", "r", "j", "x"];
-const vowels = ["a", "e", "i", "o", "u"];
-const onsetClusters = ["pf", "kn", "kl", "kr", "gn", "gl", "gr", "pl", "pr", "bl", "br", "tr", "dr", "fl", "fr", "schl", "schm", "schn", "schw", "schr", "sp", "st", "chr", "pfl", "pfr", "zw", "kw"];
-const dipthongs = ["ei", "ai", "ey", "ay", "au", "au", "eu"];
-const codaClusters = ["rt", "rst", "nst", "ngst", "cht", "tzt", "lt", "nd", "rd", "mpf", "nkt", "rk", "lk", "ck", "tz", "chs", "ngs", "rz"];
-
-type SyllablePortion = {
-    name: string;
-    weight: number;
-    table?: string[]; // no table = "empty" option
-};
-
-const onsets: SyllablePortion[] = [
-    {name: "Consonant", weight: 3, table: consonants},
-    {name: "Cluster", weight: 1, table: onsetClusters},
-    {name: "Empty", weight: 1},
-];
-
-const nuclei: SyllablePortion[] = [
-    {name: "Vowels", weight: 1, table: vowels},
-    {name: "Dipthongs", weight: 1, table: dipthongs},
-];
-
-const codas: SyllablePortion[] = [
-    {name: "Coda", weight: 1, table: codaClusters},
-    {name: "Consonants", weight: 1, table: consonants},
-    {name: "Empty", weight: 1},
-]
-
-const syllableCount = [
-    {syllables: 1, weight: 3},
-    {syllables: 2, weight: 10},
-    {syllables: 3, weight: 5},
-    {syllables: 4, weight: 1},
-]
-
-export function generateSyllable (
-    rng: Rng,
-    prevEndedInConsonant: boolean,
-): { text: string, endedInConsonant: boolean, } {
-    const onsetPool = prevEndedInConsonant
-        ? onsets.filter(p => p.name === "Empty") // must not add a second consonant
-        : onsets.filter(p => p.name !== "Empty"); // must not leave two vowels touching
-
-    const onsetPortion = pickWeighted(rng, onsetPool);
-    const onset = onsetPortion.table ? rng.pick(onsetPortion.table) : "";
-    const nucleusPortion = pickWeighted(rng, nuclei);
-    const nucleus = rng.pick(nucleusPortion.table!);
-    const codaPortion = pickWeighted(rng, codas);
-    const coda = codaPortion.table ? rng.pick(codaPortion.table) : "";
-
-    return {
-        text: onset + nucleus + coda,
-        endedInConsonant: codaPortion.name !== "Empty",
-    };
+function sonorityOf(phonemes: Phoneme[], sound: string): number {
+    const found = phonemes.find(p => sound.startsWith(p.text));
+    if (!found) throw new Error(`Unknown consonant sound: ${sound}`);
+    return found.sonority;
 }
 
-export function generateWord(seed: string, slotId: string): string {
+function splitCluster(phonemes: Phoneme[], cluster: string): string[] {
+    const sorted = [...phonemes].sort((a, b) => b.text.length - a.text.length);
+    const parts: string[] = [];
+    let remaining = cluster;
+    while (remaining.length > 0) {
+        const match = sorted.find(p => remaining.startsWith(p.text));
+        if (!match) throw new Error(`Can't parse cluster: ${cluster}`);
+        parts.push(match.text);
+        remaining = remaining.slice(match.text.length);
+    }
+    return parts;
+}
+
+function isValidOnsetCluster(phonemes: Phoneme[], cluster: string): boolean {
+    const ranks = splitCluster(phonemes, cluster).map(s => sonorityOf(phonemes, s));
+    for (let i = 1; i < ranks.length; i++) {
+        if (ranks[i] <= ranks[i - 1]) return false; // must rise toward the vowel
+    }
+    return true;
+}
+
+function isValidCodaCluster(phonemes: Phoneme[], cluster: string): boolean {
+    const ranks = splitCluster(phonemes, cluster).map(s => sonorityOf(phonemes, s));
+    for (let i = 1; i < ranks.length; i++) {
+        if (ranks[i] >= ranks[i - 1]) return false; // must fall away from the vowel
+    }
+    return true;
+}
+
+function validateLanguage(lang: LanguagePhonology): void {
+    for (const c of lang.onsetClusters) {
+        if (!isValidOnsetCluster(lang.consonants, c)) {
+            throw new Error(`${lang.name}: onset cluster "${c}" violates sonority sequencing`);
+        }
+    }
+    for (const c of lang.codaClusters) {
+        if (!isValidCodaCluster(lang.consonants, c)) {
+            throw new Error(`${lang.name}: coda cluster "${c}" violates sonority sequencing`);
+        }
+    }
+}
+
+function boundaryIsLegal(codaLastRank: number | null, onsetFirstRank: number | null): boolean {
+    if (codaLastRank === null || onsetFirstRank === null) return true; // one side is a vowel
+    return codaLastRank !== onsetFirstRank; // two consonants of the same sonority tier are hard to parse as separate
+}
+
+type ConsonantWeights = { single: number; cluster: number; empty: number };
+
+function pickConsonantSound(
+    rng: Rng,
+    lang: LanguagePhonology,
+    clusters: string[],
+    weights: ConsonantWeights,
+): { text: string; lastRank: number } {
+    const options: SyllablePortion[] = [
+        { name: "Single", weight: weights.single, table: lang.consonants.map(p => p.text) },
+        { name: "Cluster", weight: weights.cluster, table: clusters },
+        { name: "Empty", weight: weights.empty },
+    ];
+    const picked = pickWeighted(rng, options);
+    if (!picked.table) return { text: "", lastRank: -1 };
+    const text = rng.pick(picked.table);
+    const parts = splitCluster(lang.consonants, text);
+    return { text, lastRank: sonorityOf(lang.consonants, parts[parts.length - 1]) };
+}
+
+const DEFAULT_CONSONANT_WEIGHTS: ConsonantWeights = { single: 3, cluster: 1, empty: 2 };
+
+export function generateWord(
+    lang: LanguagePhonology,
+    seed: string,
+    slotId: string,
+    options?: {
+        syllableCountWeights?: { syllables: number; weight: number }[];
+        consonantWeights?: ConsonantWeights;
+    },
+): string {
+    validateLanguage(lang);
     const rng = makeChildRng(seed, slotId);
-    const count = pickWeighted(rng, syllableCount);
+    const countWeights = options?.syllableCountWeights ?? lang.syllableCountWeights;
+    const consonantWeights = options?.consonantWeights ?? DEFAULT_CONSONANT_WEIGHTS;
+    const count = pickWeighted(rng, countWeights);
 
     let word = "";
-    let prevEndedInConsonant = false;
+    let prevCodaRank: number | null = null;
 
     for (let i = 0; i < count.syllables; i++) {
-        const syllable = generateSyllable(rng, prevEndedInConsonant);
-        word += syllable.text;
-        prevEndedInConsonant = syllable.endedInConsonant;
+        let onset = pickConsonantSound(rng, lang, lang.onsetClusters, consonantWeights);
+        let tries = 0;
+        while (!boundaryIsLegal(prevCodaRank, onset.lastRank < 0 ? null : onset.lastRank) && tries < 20) {
+            onset = pickConsonantSound(rng, lang, lang.onsetClusters, consonantWeights);
+            tries++;
+        }
+
+        const nucleus = rng.pick([...lang.vowels, ...lang.diphthongs]);
+        const coda = pickConsonantSound(rng, lang, lang.codaClusters, consonantWeights);
+
+        word += onset.text + nucleus + coda.text;
+        prevCodaRank = coda.lastRank < 0 ? null : coda.lastRank;
     }
+
     return word;
+}
+
+export function generateName(lang: LanguagePhonology, seed: string, slotId: string): string {
+    const word = generateWord(lang, seed, slotId, {
+        syllableCountWeights: [
+            { syllables: 1, weight: 1 },
+            { syllables: 2, weight: 5 },
+            { syllables: 3, weight: 2 },
+        ],
+        consonantWeights: { single: 4, cluster: 1, empty: 3 },
+    });
+    return word.charAt(0).toUpperCase() + word.slice(1);
 }

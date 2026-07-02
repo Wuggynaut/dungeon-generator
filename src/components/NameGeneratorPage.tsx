@@ -1,8 +1,7 @@
 import {useState} from "react";
-import {generateWord} from "../core/names.ts";
+import {generateName} from "../core/names.ts";
 import {randomSeed} from "../core/rng.ts";
-
-
+import {german} from "../core/data/languages.ts";
 
 export default function NameGeneratorPage() {
     const [nameList, setNameList] = useState<string[]>([]);
@@ -12,18 +11,21 @@ export default function NameGeneratorPage() {
         const parsed = Number(nameCount);
         const value = nameCount.trim() === "" || Number.isNaN(parsed)
             ? 20 : parsed;
-        setNameList([]);
-        for (let i = 1; i < value+1; i++) {
-            const name = generateWord(randomSeed(), `name.${i}`);
-            setNameList(prev => [...prev, name])
+        const seed = randomSeed();
+        const names: string[] = [];
+        for (let i = 1; i < value + 1; i++) {
+            names.push(generateName(german, seed, `name.${i}`));
         }
+        setNameList(names);
     }
 
     return (
         <>
             <div>
                 <h2>Name Generator</h2>
-                <button onClick={generateNameList} />
+                <div/>
+                <button onClick={generateNameList}>Generate</button>
+                <div/>
                 <input
                     type="number"
                     value={nameCount}
