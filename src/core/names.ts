@@ -1,8 +1,8 @@
 import {makeChildRng, pickWeighted, type Rng} from "./rng.ts";
-import type {LanguagePhonology, Phoneme, SyllablePortion} from "./data/languages.ts";
+import type {LanguagePhonology, Phoneme, SyllablePortion, VowelHarmony} from "./data/languages.ts";
 
 function sonorityOf(phonemes: Phoneme[], sound: string): number {
-    const found = phonemes.find(p => sound.startsWith(p.text));
+    const found = phonemes.find(p => p.text === sound);
     if (!found) throw new Error(`Unknown consonant sound: ${sound}`);
     return found.sonority;
 }
@@ -55,6 +55,38 @@ function boundaryIsLegal(codaLastRank: number | null, onsetFirstRank: number | n
     return codaLastRank !== onsetFirstRank;
 }
 
+function vowelClass(harmony: VowelHarmony, sound: string): "front" | "back" | "neutral" {
+    for (const ch of sound) {
+        if (harmony.front.includes(ch)) return "front";
+        if (harmony.back.includes(ch)) return "back";
+    }
+    return "neutral";
+}
+
+function pickHarmonicNucleus(
+    rng: Rng,
+    lang: LanguagePhonology,
+    lockedClass: "front" | "back" | null,
+): { text: string; lockedClass: "front" | "back" | null } {
+    const allVowels = [...lang.vowels, ...lang.diphthongs];
+
+    if (!lang.vowelHarmony) {
+        return { text: rng.pick(allVowels), lockedClass: null };
+    }
+
+    const harmony = lang.vowelHarmony;
+    const forbidden = lockedClass === "front" ? "back" : lockedClass === "back" ? "front" : null;
+    const allowed = forbidden
+        ? allVowels.filter(v => vowelClass(harmony, v) !== forbidden)
+        : allVowels;
+
+    const picked = rng.pick(allowed);
+    const pickedClass = vowelClass(harmony, picked);
+    const nextLockedClass = pickedClass === "neutral" ? lockedClass : pickedClass;
+
+    return { text: picked, lockedClass: nextLockedClass };
+}
+
 type ConsonantWeights = { single: number; cluster: number; empty: number };
 
 function pickConsonantSound(
@@ -62,14 +94,20 @@ function pickConsonantSound(
     lang: LanguagePhonology,
     clusters: string[],
     weights: ConsonantWeights,
+    position: "onset" | "coda",
 ): { text: string; firstRank: number; lastRank: number } {
-    const options = [
-        { name: "Single", weight: weights.single, table: lang.consonants.map(p => p.text) },
-        { name: "Cluster", weight: weights.cluster, table: clusters },
+    const singles = lang.consonants
+        .filter(p => position === "onset" ? (p.onsetOk ?? true) : (p.codaOk ?? true))
+        .map(p => p.text);
+
+    const options: SyllablePortion[] = [
+        { name: "Single", weight: singles.length > 0 ? weights.single : 0, table: singles },
+        { name: "Cluster", weight: clusters.length > 0 ? weights.cluster : 0, table: clusters },
         { name: "Empty", weight: weights.empty },
     ];
+
     const picked = pickWeighted(rng, options);
-    if (!picked.table) return { text: "", firstRank: -1, lastRank: -1 };
+    if (!picked.table || picked.table.length === 0) return { text: "", firstRank: -1, lastRank: -1 };
     const text = rng.pick(picked.table);
     const parts = splitCluster(lang.consonants, text);
     return {
@@ -79,18 +117,13 @@ function pickConsonantSound(
     };
 }
 
-function isVowelSound(lang: LanguagePhonology, text: string): boolean {
-    return lang.vowels.includes(text) || lang.diphthongs.includes(text) ||
-        lang.vowels.some(v => text.endsWith(v)) || lang.diphthongs.some(d => text.endsWith(d));
-}
-
 function pickNameEnding(rng: Rng, lang:LanguagePhonology) {
     if (lang.nameEndings) return rng.pick(lang.nameEndings);
     const onset = pickConsonantSound(rng, lang, lang.onsetClusters, {
         empty: 7,
         single: 3,
         cluster: 0,
-    });
+    }, "onset");
     const nucleus = rng.pick([
         ...lang.vowels,
         ...lang.diphthongs,
@@ -100,7 +133,7 @@ function pickNameEnding(rng: Rng, lang:LanguagePhonology) {
         empty: 7,
         single: 3,
         cluster: 0,
-    });
+    }, "coda");
 
     return onset.text + nucleus + coda.text;
 }
@@ -125,16 +158,19 @@ export function generateWord(
 
     let word = "";
     let prevCodaRank: number | null = null;
+    let harmonyClass: "front" | "back" | null = null;
 
     for (let i = 0; i < count.syllables; i++) {
-        let onset = pickConsonantSound(rng, lang, lang.onsetClusters, consonantWeights);
+        let onset = pickConsonantSound(rng, lang, lang.onsetClusters, consonantWeights, "onset");
         let tries = 0;
         while (!boundaryIsLegal(prevCodaRank, onset.firstRank < 0 ? null : onset.firstRank) && tries < 20) {
-            onset = pickConsonantSound(rng, lang, lang.onsetClusters, consonantWeights);
+            onset = pickConsonantSound(rng, lang, lang.onsetClusters, consonantWeights, "onset");
             tries++;
         }
 
-        const nucleus = rng.pick([...lang.vowels, ...lang.diphthongs]);
+        const nucleusResult = pickHarmonicNucleus(rng, lang, harmonyClass);
+        const nucleus = nucleusResult.text;
+        harmonyClass = nucleusResult.lockedClass;
         const isFinal = i === count.syllables - 1;
         const codaWeights =
             isFinal
@@ -145,7 +181,8 @@ export function generateWord(
             rng,
             lang,
             lang.codaClusters,
-            codaWeights
+            codaWeights,
+            "coda"
         );
 
         word += onset.text + nucleus + coda.text;
@@ -187,4 +224,20 @@ export function generateName(lang: LanguagePhonology, seed: string, slotId: stri
 
     const name = stem + ending;
     return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+export function generateProperNoun(
+    lang: LanguagePhonology,
+    seed: string,
+    slotId: string,
+): string {
+    const word = generateWord(lang, seed, slotId, {
+        syllableCountWeights: [
+            { syllables: 2, weight: 5 },
+            { syllables: 3, weight: 3 },
+        ],
+        consonantWeights: { single: 4, cluster: 1, empty: 2 },
+        finalCodaWeights: { single: 3, cluster: 0, empty: 4 },
+    });
+    return word.charAt(0).toUpperCase() + word.slice(1);
 }
