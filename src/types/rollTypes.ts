@@ -9,7 +9,11 @@ export type RoomType = {
     name: string;
     weight: number;
     table: PairedTable;
-};
+}
+
+export type Species = { name: string; tags: string[] };
+
+export type Family = { name: string; tags: string[]; species: Species[] };
 
 export type SlotOverride = {
     rerollCount?: number;  // how many times the user has rerolled this slot
@@ -44,6 +48,7 @@ export type Denizens = {
 
 export type Faction = {
     group: Slot;
+    species: Slot;   // drawn from the group's family roster
     strength: number;
     agenda: Roll;
 };
@@ -54,6 +59,7 @@ export type Room = {
     roll: Roll;
     monster?: Slot; // specific monster; only set for rooms whose group is in the bestiary
     occupantFaction?: number; // index into dungeon.factions; absent = unaligned or non-monster room
+    details?: Slot[]; // rolled dressing lines; slot ids are room.<id>.detail.<n>
 };
 
 export type Dungeon = {

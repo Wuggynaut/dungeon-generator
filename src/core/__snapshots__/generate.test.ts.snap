@@ -10,11 +10,11 @@ exports[`generate > matches the pinned snapshot 1`] = `
       ],
       "left": {
         "id": "denizens.attitude.left",
-        "value": "Suave",
+        "value": "Studious",
       },
       "right": {
         "id": "denizens.attitude.right",
-        "value": "Greedy",
+        "value": "Sarcastic",
       },
     },
     "standoutNPC": {
@@ -24,11 +24,11 @@ exports[`generate > matches the pinned snapshot 1`] = `
       ],
       "left": {
         "id": "denizens.standoutNPC.left",
-        "value": "Deductive",
+        "value": "Incisive",
       },
       "right": {
         "id": "denizens.standoutNPC.right",
-        "value": "Aloof",
+        "value": "Impulsive",
       },
     },
   },
@@ -41,13 +41,22 @@ exports[`generate > matches the pinned snapshot 1`] = `
         ],
         "left": {
           "id": "faction.0.agenda.left",
-          "value": "Protection",
+          "value": "Redemption",
         },
         "right": {
           "id": "faction.0.agenda.right",
-          "value": "Incompetence",
+          "value": "Sacrifice",
         },
       },
+      "group": {
+        "id": "faction.0.group",
+        "value": "Construct",
+      },
+      "species": {
+        "id": "faction.0.species",
+        "value": "Cobblehounds",
+      },
+      "strength": 1,
     },
     {
       "agenda": {
@@ -57,13 +66,22 @@ exports[`generate > matches the pinned snapshot 1`] = `
         ],
         "left": {
           "id": "faction.1.agenda.left",
-          "value": "Innovation",
+          "value": "Wealth",
         },
         "right": {
           "id": "faction.1.agenda.right",
-          "value": "Ignorance",
+          "value": "Incompetence",
         },
       },
+      "group": {
+        "id": "faction.1.group",
+        "value": "Goblinoid",
+      },
+      "species": {
+        "id": "faction.1.species",
+        "value": "Ogre",
+      },
+      "strength": 1,
     },
   ],
   "history": {
@@ -74,11 +92,11 @@ exports[`generate > matches the pinned snapshot 1`] = `
       ],
       "left": {
         "id": "history.construction.left",
-        "value": "Starlight Path",
+        "value": "An Enormous Grave",
       },
       "right": {
         "id": "history.construction.right",
-        "value": "Earth",
+        "value": "Obsidian",
       },
     },
     "purpose": {
@@ -88,7 +106,7 @@ exports[`generate > matches the pinned snapshot 1`] = `
       ],
       "left": {
         "id": "history.purpose.left",
-        "value": "Bestial Creations",
+        "value": "Hideout",
       },
       "right": {
         "id": "history.purpose.right",
@@ -102,79 +120,54 @@ exports[`generate > matches the pinned snapshot 1`] = `
       ],
       "left": {
         "id": "history.ruination.left",
-        "value": "Displaced",
+        "value": "Devoured",
       },
       "right": {
         "id": "history.ruination.right",
-        "value": "Disease",
+        "value": "Cataclysmic Flood",
       },
     },
   },
   "map": {
     "edges": [
       {
-        "a": 1,
-        "b": 4,
-        "type": "conditional",
-      },
-      {
         "a": 5,
-        "b": 10,
+        "b": 9,
         "type": "standard",
       },
       {
         "a": 6,
-        "b": 7,
-        "type": "hidden",
-      },
-      {
-        "a": 3,
-        "b": 5,
-        "type": "standard",
-      },
-      {
-        "a": 4,
-        "b": 8,
-        "type": "conditional",
-      },
-      {
-        "a": 2,
-        "b": 9,
-        "type": "standard",
-      },
-      {
-        "a": 9,
-        "b": 10,
-        "type": "standard",
-      },
-      {
-        "a": 7,
-        "b": 9,
-        "type": "standard",
-      },
-      {
-        "a": 1,
-        "b": 3,
-        "type": "standard",
-      },
-      {
-        "a": 7,
         "b": 11,
         "type": "standard",
       },
       {
         "a": 1,
-        "b": 2,
+        "b": 5,
+        "type": "standard",
+      },
+      {
+        "a": 7,
+        "b": 8,
         "type": "standard",
       },
       {
         "a": 2,
-        "b": 7,
-        "type": "conditional",
+        "b": 10,
+        "type": "standard",
       },
       {
-        "a": 2,
+        "a": 3,
+        "b": 6,
+        "type": "standard",
+      },
+      {
+        "a": 1,
         "b": 3,
+        "type": "standard",
+      },
+      {
+        "a": 3,
+        "b": 4,
         "type": "standard",
       },
       {
@@ -182,97 +175,135 @@ exports[`generate > matches the pinned snapshot 1`] = `
         "b": 11,
         "type": "standard",
       },
+      {
+        "a": 8,
+        "b": 12,
+        "type": "standard",
+      },
+      {
+        "a": 8,
+        "b": 10,
+        "type": "standard",
+      },
+      {
+        "a": 1,
+        "b": 4,
+        "type": "standard",
+      },
+      {
+        "a": 2,
+        "b": 9,
+        "type": "conditional",
+      },
     ],
     "entrance": 1,
     "nodes": [
       {
         "number": 1,
         "roomId": 1,
-        "x": 174.52213475480676,
-        "y": 3.3378378488123417,
-      },
-      {
-        "number": 2,
-        "roomId": 2,
-        "x": 262.12048218659504,
-        "y": 234.2424412164476,
-      },
-      {
-        "number": 3,
-        "roomId": 3,
-        "x": 76.11958978292455,
-        "y": 131.8880248094762,
-      },
-      {
-        "number": 4,
-        "roomId": 4,
-        "x": 303.74353519842566,
-        "y": 25.186813610877376,
-      },
-      {
-        "number": 7,
-        "roomId": 5,
-        "x": 22.944364528146963,
-        "y": 259.624620570578,
-      },
-      {
-        "number": 9,
-        "roomId": 6,
-        "x": 470.81697518686934,
-        "y": 330.4315509543988,
-      },
-      {
-        "number": 5,
-        "roomId": 7,
-        "x": 376.87499284769126,
-        "y": 431.222242193551,
+        "x": 456,
+        "y": 48,
       },
       {
         "number": 8,
+        "roomId": 2,
+        "x": 576,
+        "y": 336,
+      },
+      {
+        "number": 2,
+        "roomId": 3,
+        "x": 336,
+        "y": 192,
+      },
+      {
+        "number": 3,
+        "roomId": 4,
+        "x": 192,
+        "y": 72,
+      },
+      {
+        "number": 4,
+        "roomId": 5,
+        "x": 624,
+        "y": 72,
+      },
+      {
+        "number": 5,
+        "roomId": 6,
+        "x": 264,
+        "y": 360,
+      },
+      {
+        "number": 11,
+        "roomId": 7,
+        "x": 840,
+        "y": 456,
+      },
+      {
+        "number": 10,
         "roomId": 8,
-        "x": 423.04275594414617,
-        "y": 95.96762430749061,
+        "x": 720,
+        "y": 576,
       },
       {
         "number": 6,
         "roomId": 9,
-        "x": 226.8877955721854,
-        "y": 380.8858542854119,
+        "x": 768,
+        "y": 144,
       },
       {
-        "number": 11,
+        "number": 9,
         "roomId": 10,
-        "x": 69.08184162830406,
-        "y": 384.10869642514456,
+        "x": 528,
+        "y": 504,
       },
       {
-        "number": 10,
+        "number": 7,
         "roomId": 11,
-        "x": 562.589029531317,
-        "y": 557.3646195654894,
+        "x": 336,
+        "y": 504,
+      },
+      {
+        "number": 12,
+        "roomId": 12,
+        "x": 888,
+        "y": 672,
       },
     ],
   },
   "rooms": [
     {
+      "details": [
+        {
+          "id": "room.1.detail.0",
+          "value": "Scorch marks, long gone cold",
+        },
+      ],
       "id": 1,
       "roll": {
         "columns": [
-          "Group",
-          "Activity",
+          "Room Type",
+          "Clue",
         ],
         "left": {
           "id": "room.1.left",
-          "value": "Plant",
+          "value": "Cistern",
         },
         "right": {
           "id": "room.1.right",
-          "value": "Praying",
+          "value": "Leavings",
         },
       },
-      "type": "Monster",
+      "type": "Lore",
     },
     {
+      "details": [
+        {
+          "id": "room.2.detail.0",
+          "value": "Pale mushrooms clustered low on a wall",
+        },
+      ],
       "id": 2,
       "roll": {
         "columns": [
@@ -281,52 +312,75 @@ exports[`generate > matches the pinned snapshot 1`] = `
         ],
         "left": {
           "id": "room.2.left",
-          "value": "Barracks",
+          "value": "Shrine",
         },
         "right": {
           "id": "room.2.right",
-          "value": "Draft",
+          "value": "Noise",
         },
       },
       "type": "Lore",
     },
     {
+      "details": [
+        {
+          "id": "room.3.detail.0",
+          "value": "Water dripping steadily from above",
+        },
+      ],
       "id": 3,
       "roll": {
         "columns": [
-          "Room Type",
-          "Clue",
+          "Special",
+          "Feature",
         ],
         "left": {
           "id": "room.3.left",
-          "value": "Dining Hall",
+          "value": "Bridge",
         },
         "right": {
           "id": "room.3.right",
-          "value": "Leavings",
+          "value": "Shifts",
         },
       },
-      "type": "Lore",
+      "type": "Special",
     },
     {
+      "details": [
+        {
+          "id": "room.4.detail.0",
+          "value": "A cracked, yellowed skull",
+        },
+      ],
       "id": 4,
+      "monster": {
+        "id": "room.4.monster",
+        "value": "Bone Construct",
+      },
+      "occupantFaction": 0,
       "roll": {
         "columns": [
-          "Room Type",
-          "Clue",
+          "Group",
+          "Activity",
         ],
         "left": {
           "id": "room.4.left",
-          "value": "Dining Hall",
+          "value": "Construct",
         },
         "right": {
           "id": "room.4.right",
-          "value": "Draft",
+          "value": "Mating",
         },
       },
-      "type": "Lore",
+      "type": "Monster",
     },
     {
+      "details": [
+        {
+          "id": "room.5.detail.0",
+          "value": "Water dripping steadily from above",
+        },
+      ],
       "id": 5,
       "roll": {
         "columns": [
@@ -335,34 +389,46 @@ exports[`generate > matches the pinned snapshot 1`] = `
         ],
         "left": {
           "id": "room.5.left",
-          "value": "Latrine",
+          "value": "Cistern",
         },
         "right": {
           "id": "room.5.right",
-          "value": "Footprints",
+          "value": "Draft",
         },
       },
       "type": "Lore",
     },
     {
+      "details": [
+        {
+          "id": "room.6.detail.0",
+          "value": "A crumbling section of floor",
+        },
+      ],
       "id": 6,
       "roll": {
         "columns": [
-          "Group",
-          "Activity",
+          "Special",
+          "Feature",
         ],
         "left": {
           "id": "room.6.left",
-          "value": "Extraplanar",
+          "value": "Flames",
         },
         "right": {
           "id": "room.6.right",
-          "value": "Growing",
+          "value": "Grows",
         },
       },
-      "type": "Monster",
+      "type": "Special",
     },
     {
+      "details": [
+        {
+          "id": "room.7.detail.0",
+          "value": "A broken shard of glass",
+        },
+      ],
       "id": 7,
       "roll": {
         "columns": [
@@ -371,16 +437,22 @@ exports[`generate > matches the pinned snapshot 1`] = `
         ],
         "left": {
           "id": "room.7.left",
-          "value": "Confuses",
+          "value": "Freezes",
         },
         "right": {
           "id": "room.7.right",
-          "value": "Reading",
+          "value": "Activating",
         },
       },
       "type": "Trap",
     },
     {
+      "details": [
+        {
+          "id": "room.8.detail.0",
+          "value": "A crude tally scratched into the stone",
+        },
+      ],
       "id": 8,
       "roll": {
         "columns": [
@@ -389,35 +461,52 @@ exports[`generate > matches the pinned snapshot 1`] = `
         ],
         "left": {
           "id": "room.8.left",
-          "value": "Shrine",
+          "value": "Stable",
         },
         "right": {
           "id": "room.8.right",
-          "value": "Paraphernalia",
+          "value": "Decay",
         },
       },
       "type": "Lore",
     },
     {
+      "details": [
+        {
+          "id": "room.9.detail.0",
+          "value": "A length of rotted rope",
+        },
+      ],
       "id": 9,
       "roll": {
         "columns": [
-          "Room Type",
-          "Clue",
+          "Trap",
+          "Trigger",
         ],
         "left": {
           "id": "room.9.left",
-          "value": "Vault",
+          "value": "Cuts",
         },
         "right": {
           "id": "room.9.right",
-          "value": "Noise",
+          "value": "Pulling",
         },
       },
-      "type": "Lore",
+      "type": "Trap",
     },
     {
+      "details": [
+        {
+          "id": "room.10.detail.0",
+          "value": "A dead rat, half-rotted",
+        },
+      ],
       "id": 10,
+      "monster": {
+        "id": "room.10.monster",
+        "value": "Ogre",
+      },
+      "occupantFaction": 1,
       "roll": {
         "columns": [
           "Group",
@@ -425,29 +514,64 @@ exports[`generate > matches the pinned snapshot 1`] = `
         ],
         "left": {
           "id": "room.10.left",
-          "value": "Shape Shifter",
+          "value": "Goblinoid",
         },
         "right": {
           "id": "room.10.right",
-          "value": "Sleeping",
+          "value": "Killing",
         },
       },
       "type": "Monster",
     },
     {
+      "details": [
+        {
+          "id": "room.11.detail.0",
+          "value": "Mud tracked in a long smear",
+        },
+      ],
       "id": 11,
+      "roll": {
+        "columns": [
+          "Trap",
+          "Trigger",
+        ],
+        "left": {
+          "id": "room.11.left",
+          "value": "Confuses",
+        },
+        "right": {
+          "id": "room.11.right",
+          "value": "Entering",
+        },
+      },
+      "type": "Trap",
+    },
+    {
+      "details": [
+        {
+          "id": "room.12.detail.0",
+          "value": "A scattering of small animal bones",
+        },
+      ],
+      "id": 12,
+      "monster": {
+        "id": "room.12.monster",
+        "value": "Gargoyle",
+      },
+      "occupantFaction": 0,
       "roll": {
         "columns": [
           "Group",
           "Activity",
         ],
         "left": {
-          "id": "room.11.left",
+          "id": "room.12.left",
           "value": "Construct",
         },
         "right": {
-          "id": "room.11.right",
-          "value": "Recuperating",
+          "id": "room.12.right",
+          "value": "Fighting",
         },
       },
       "type": "Monster",

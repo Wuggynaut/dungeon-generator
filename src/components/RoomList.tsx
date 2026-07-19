@@ -52,6 +52,7 @@ export function RoomList({ rooms, numberByRoomId, selected, onSelect, controls }
                             roll={room.roll}
                             controls={controls}
                             extra={room.monster ? { label: "Monster", slot: room.monster } : undefined}
+                            extras={room.details?.map(d => ({ label: "Detail", slot: d }))}
                         />
                     </li>
                 ))}

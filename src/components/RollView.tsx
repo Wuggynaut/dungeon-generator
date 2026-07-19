@@ -59,11 +59,14 @@ export default function RollView({
                                      controls,
                                      layout = "spread",
                                      extra,
+                                     extras,
                                  }: {
     roll: Roll;
     controls: SlotControls;
     layout?: "spread" | "compact";
     extra?: { label: string; slot: Slot };
+    extras?: { label: string; slot: Slot }[];
+
 }) {
     return (
         <div className={layout === "compact" ? styles.compact : undefined}>
@@ -72,6 +75,9 @@ export default function RollView({
             {extra && (
                 <Cell label={extra.label} slotId={extra.slot.id} value={extra.slot.value} controls={controls} />
             )}
+            {extras?.map(x => (
+                <Cell key={x.slot.id} label={x.label} slotId={x.slot.id} value={x.slot.value} controls={controls} />
+            ))}
         </div>
     );
 }

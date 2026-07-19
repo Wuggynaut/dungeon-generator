@@ -89,6 +89,9 @@ export function rollOne(
     if (override?.editValue !== undefined) {
         return { id: slotId, value: override.editValue };
     }
+    if (options.length === 0) {
+        return { id: slotId, value: "" }; // nothing to roll (e.g. a custom group with no roster)
+    }
     const count = override?.rerollCount ?? 0;
     return { id: slotId, value: rolledFromList(seed, options, slotId, count) };
 }

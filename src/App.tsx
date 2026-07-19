@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { generate } from "./core/generate.ts";
+import { generate, dominantFactionIndex } from "./core/generate.ts";
 import { type Config, defaultConfig } from "./core/config.ts";
 import type { Overrides, SlotControls } from "./types/rollTypes.ts";
 import { Section } from "./components/Section.tsx";
@@ -246,6 +246,8 @@ export default function App() {
                                 label: `Faction ${index + 1}`,
                                 roll: faction.agenda,
                                 extra: { label: "Group", slot: faction.group },
+                                extras: [{ label: "Species", slot: faction.species }],
+                                meta: `Strength ${faction.strength}${index === dominantFactionIndex(dungeon.factions) ? ", dominant" : ""}`,
                             }))}
                             note={notes["notes.factions"] ?? ""}
                             onNote={text => setNote("notes.factions", text)}

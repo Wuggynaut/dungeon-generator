@@ -1,5 +1,6 @@
 import type {Dungeon, Roll} from "../types/rollTypes.ts";
 import type {PathType} from "../types/mapTypes.ts";
+import {dominantFactionIndex} from "./generate.ts";
 
 type Notes = Record<string, string>;
 
@@ -51,6 +52,7 @@ function roomsSection(dungeon: Dungeon): string {
             `- ${room.roll.columns[0]}: ${room.roll.left.value}`,
             `- ${room.roll.columns[1]}: ${room.roll.right.value}`,
             ...(room.monster ? [`- Monster: ${room.monster.value}`] : []),
+            ...(room.details ?? []).map(d => `- Detail: ${d.value}`),
             ...(room.occupantFaction !== undefined ? [`- Held by: Faction ${room.occupantFaction + 1}`] : []),
             `- Connections: ${links || "none"}`,
         ].join("\n");
@@ -62,6 +64,7 @@ function roomsSection(dungeon: Dungeon): string {
 
 export function serializeMarkdown(dungeon: Dungeon, notes: Notes = {}): string {
     const blocks: string[] = [`# Dungeon: ${dungeon.seed}`];
+    const dominant = dominantFactionIndex(dungeon.factions);
 
     blocks.push(section(
         "History",
@@ -88,7 +91,7 @@ export function serializeMarkdown(dungeon: Dungeon, notes: Notes = {}): string {
         "Factions",
         "What is each faction trying to achieve, and what stands in their way?",
         dungeon.factions.map((f, i) =>
-            `${rollLine(`Faction ${i + 1}`, f.agenda)} (Group: ${f.group.value})`
+            `${rollLine(`Faction ${i + 1}`, f.agenda)} (${f.group.value}: ${f.species.value}, strength ${f.strength}${i === dominant ? ", dominant" : ""})`
         ),
         noteBlock(notes, "notes.factions"),
     ));

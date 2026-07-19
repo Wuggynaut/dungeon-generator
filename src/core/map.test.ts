@@ -76,7 +76,7 @@ function isConnected(edges: { a: number; b: number }[], nodeCount: number): bool
 describe("spanningTree", () => {
     it("connects every room with no spare edges", () => {
         const points = placePoints(makeChildRng("test-seed", "map"), 12);
-        const tree = spanningTree(candidateEdges(points), points.length);
+        const tree = spanningTree(candidateEdges(points), points.length, points);
 
         expect(tree).toHaveLength(points.length - 1);
         expect(isConnected(tree, points.length)).toBe(true);
@@ -85,14 +85,14 @@ describe("spanningTree", () => {
     it("uses only candidate edges and is deterministic", () => {
         const points = placePoints(makeChildRng("test-seed", "map"), 12);
         const candidates = candidateEdges(points);
-        const tree = spanningTree(candidates, points.length);
+        const tree = spanningTree(candidates, points.length, points);
 
         const candidateKeys = new Set(candidates.map(edge => `${edge.a}-${edge.b}`));
         for (const edge of tree) {
             expect(candidateKeys.has(`${edge.a}-${edge.b}`)).toBe(true);
         }
 
-        expect(spanningTree(candidates, points.length)).toEqual(tree);
+        expect(spanningTree(candidates, points.length, points)).toEqual(tree);
     });
 });
 
@@ -100,8 +100,8 @@ describe("addLoops", () => {
     it("stays connected and respects the degree cap", () => {
         const points = placePoints(makeChildRng("test-seed", "map"), 12);
         const candidates = candidateEdges(points);
-        const tree = spanningTree(candidates, points.length);
-        const edges = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"));
+        const tree = spanningTree(candidates, points.length, points);
+        const edges = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"), points);
 
         expect(isConnected(edges, points.length)).toBe(true);
         expect(edges.length).toBeGreaterThanOrEqual(tree.length); // only added, never removed
@@ -117,15 +117,15 @@ describe("addLoops", () => {
     it("only adds candidate edges and is deterministic", () => {
         const points = placePoints(makeChildRng("test-seed", "map"), 12);
         const candidates = candidateEdges(points);
-        const tree = spanningTree(candidates, points.length);
+        const tree = spanningTree(candidates, points.length, points);
 
         const candidateKeys = new Set(candidates.map(edge => `${edge.a}-${edge.b}`));
-        const edges = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"));
+        const edges = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"), points);
         for (const edge of edges) {
             expect(candidateKeys.has(`${edge.a}-${edge.b}`)).toBe(true);
         }
 
-        const again = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"));
+        const again = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"), points);
         expect(again).toEqual(edges);
     });
 });
@@ -152,8 +152,8 @@ describe("numberRooms", () => {
     it("numbers every room once, starting at the entrance", () => {
         const points = placePoints(makeChildRng("test-seed", "map"), 12);
         const candidates = candidateEdges(points);
-        const tree = spanningTree(candidates, points.length);
-        const edges = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"));
+        const tree = spanningTree(candidates, points.length, points);
+        const edges = addLoops(tree, candidates, points.length, makeChildRng("test-seed", "map"), points);
         const entrance = findEntrance(points);
 
         const numbers = numberRooms(edges, points.length, entrance);

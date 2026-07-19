@@ -22,81 +22,99 @@ exports[`serializeMarkdown > matches the pinned snapshot 1`] = `
 
 *What is each faction trying to achieve, and what stands in their way?*
 
-- **Faction 1** — Goal: Redemption; Obstacle: Sacrifice
-- **Faction 2** — Goal: Wealth; Obstacle: Incompetence
+- **Faction 1** — Goal: Redemption; Obstacle: Sacrifice (Construct: Cobblehounds, strength 1, dominant)
+- **Faction 2** — Goal: Wealth; Obstacle: Incompetence (Goblinoid: Ogre, strength 1)
 
 ## Rooms
 
-### 1. Trap (Entrance)
+### 1. Lore (Entrance)
 
-- Trap: Confuses
-- Trigger: Entering
+- Room Type: Cistern
+- Clue: Leavings
+- Detail: Scorch marks, long gone cold
 - Connections: 2 (standard), 3 (standard), 4 (standard)
 
 ### 2. Special
 
-- Special: Flames
-- Feature: Grows
-- Connections: 1 (standard), 5 (standard)
-
-### 3. Lore
-
-- Room Type: Stable
-- Clue: Decay
-- Connections: 1 (standard), 6 (conditional), 7 (standard)
-
-### 4. Monster
-
-- Group: Magical
-- Activity: Fighting
-- Connections: 1 (standard), 5 (standard)
-
-### 5. Trap
-
-- Trap: Freezes
-- Trigger: Activating
-- Connections: 2 (standard), 4 (standard), 8 (standard)
-
-### 6. Lore
-
-- Room Type: Shrine
-- Clue: Noise
-- Connections: 3 (conditional), 8 (standard)
-
-### 7. Monster
-
-- Group: Fey
-- Activity: Mating
-- Connections: 3 (standard), 9 (conditional)
-
-### 8. Trap
-
-- Trap: Cuts
-- Trigger: Pulling
-- Connections: 5 (standard), 6 (standard), 10 (standard)
-
-### 9. Lore
-
-- Room Type: Cistern
-- Clue: Leavings
-- Connections: 7 (conditional), 11 (hidden)
-
-### 10. Monster
-
-- Group: Construct
-- Activity: Killing
-- Connections: 8 (standard), 12 (standard)
-
-### 11. Special
-
 - Special: Bridge
 - Feature: Shifts
-- Connections: 9 (hidden), 12 (standard)
+- Detail: Water dripping steadily from above
+- Connections: 1 (standard), 3 (standard), 5 (standard)
 
-### 12. Lore
+### 3. Monster
+
+- Group: Construct
+- Activity: Mating
+- Monster: Bone Construct
+- Detail: A cracked, yellowed skull
+- Held by: Faction 1
+- Connections: 1 (standard), 2 (standard)
+
+### 4. Lore
 
 - Room Type: Cistern
 - Clue: Draft
-- Connections: 10 (standard), 11 (standard)
+- Detail: Water dripping steadily from above
+- Connections: 1 (standard), 6 (standard)
+
+### 5. Special
+
+- Special: Flames
+- Feature: Grows
+- Detail: A crumbling section of floor
+- Connections: 2 (standard), 7 (standard)
+
+### 6. Trap
+
+- Trap: Cuts
+- Trigger: Pulling
+- Detail: A length of rotted rope
+- Connections: 4 (standard), 8 (conditional)
+
+### 7. Trap
+
+- Trap: Confuses
+- Trigger: Entering
+- Detail: Mud tracked in a long smear
+- Connections: 5 (standard), 9 (standard)
+
+### 8. Lore
+
+- Room Type: Shrine
+- Clue: Noise
+- Detail: Pale mushrooms clustered low on a wall
+- Connections: 6 (conditional), 9 (standard)
+
+### 9. Monster
+
+- Group: Goblinoid
+- Activity: Killing
+- Monster: Ogre
+- Detail: A dead rat, half-rotted
+- Held by: Faction 2
+- Connections: 7 (standard), 8 (standard), 10 (standard)
+
+### 10. Lore
+
+- Room Type: Stable
+- Clue: Decay
+- Detail: A crude tally scratched into the stone
+- Connections: 9 (standard), 11 (standard), 12 (standard)
+
+### 11. Trap
+
+- Trap: Freezes
+- Trigger: Activating
+- Detail: A broken shard of glass
+- Connections: 10 (standard)
+
+### 12. Monster
+
+- Group: Construct
+- Activity: Fighting
+- Monster: Gargoyle
+- Detail: A scattering of small animal bones
+- Held by: Faction 1
+- Connections: 10 (standard)
 "
 `;
