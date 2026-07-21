@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { generate, dominantFactionIndex } from "./generate.ts";
+import { generate } from "./generate.ts";
+import { dominantFactionIndex } from "./context.ts";
 import {defaultConfig} from "./config.ts";
 import { monstersByGroup } from "./data/monsters.ts";
 
@@ -25,11 +26,11 @@ describe("generate", () => {
         expect(d.factions[0].agenda.cells[0].id).toBe("faction.0.agenda.col.0");
     });
 
-    it("gives each faction a species drawn from its family roster", () => {
+    it("gives each faction a Type (family) that exists in the bestiary", () => {
         const d = generate("test-seed");
         d.factions.forEach((f, i) => {
-            expect(f.species.id).toBe(`faction.${i}.species`);
-            expect(monstersByGroup[f.group.value]).toContain(f.species.value);
+            expect(f.group.id).toBe(`faction.${i}.group`);
+            expect(monstersByGroup[f.group.value]).toBeDefined();
         });
     });
 
@@ -46,26 +47,31 @@ describe("generate", () => {
         expect(dominantFactionIndex(factions)).toBe(1);
     });
 
-    it("rerolls a monster room's family and allegiance independently", () => {
+    it("cascades a monster room's creature reroll (family, then species)", () => {
         const base = generate("test-seed");
-        const monsterRoom = base.rooms.find(r => r.type === "Monster");
-        expect(monsterRoom).toBeDefined();
-        const id = monsterRoom!.id;
+        // A room that can vary: unaligned (family cascades) or a multi-species family.
+        const varying = base.rooms.find(r =>
+            r.type === "Monster" &&
+            (r.occupantFaction === undefined || (monstersByGroup[r.family!]?.length ?? 0) > 1));
+        expect(varying, "expected a monster room able to vary").toBeDefined();
+        const id = varying!.id;
 
-        // Rerolling the family slot must not change the room's allegiance.
-        const familyRerolled = generate("test-seed", defaultConfig, {
-            [`room.${id}.col.0`]: { rerollCount: 3 },
-        });
-        const afterFamily = familyRerolled.rooms.find(r => r.id === id)!;
-        expect(afterFamily.occupantFaction).toBe(monsterRoom!.occupantFaction);
+        const states = new Set<string>();
+        for (let c = 0; c <= 4; c++) {
+            const room = generate("test-seed", defaultConfig, { [`room.${id}.monster`]: { rerollCount: c } })
+                .rooms.find(r => r.id === id)!;
+            states.add(`${room.family}:${room.monster?.value}`);
+        }
+        expect(states.size).toBeGreaterThan(1);
+    });
 
-        // Allegiance has its own slot; rerolling it yields a valid faction or unaligned.
-        const allegianceRerolled = generate("test-seed", defaultConfig, {
-            [`room.${id}.occupant`]: { rerollCount: 1 },
-        });
-        const afterAllegiance = allegianceRerolled.rooms.find(r => r.id === id)!;
-        const occ = afterAllegiance.occupantFaction;
-        expect(occ === undefined || (occ >= 0 && occ < base.factions.length)).toBe(true);
+    it("allegiance reroll avoids the previous result", () => {
+        const base = generate("test-seed");
+        const id = base.rooms.find(r => r.type === "Monster")!.id;
+        const before = base.rooms.find(r => r.id === id)!.occupantFaction ?? null;
+        const after = generate("test-seed", defaultConfig, { [`room.${id}.occupant`]: { rerollCount: 1 } })
+            .rooms.find(r => r.id === id)!.occupantFaction ?? null;
+        expect(after).not.toBe(before);
     });
 
     it("gives every room exactly one detail with a stable slot id", () => {

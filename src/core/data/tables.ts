@@ -3,7 +3,7 @@ import type { Table, RoomType } from "../../types/rollTypes.ts";
 
 export const purpose: Table = {
     columns: [
-        { label: "Original Use", values: ["Ancestral Rites", "Arcane Library", "Astral Trading Hub", "Bestial Creations", "Breeding Grounds", "Burial Site", "Celestial Observations", "Covert Experiments", "Forbidden Trysts", "Forge for a Great Weapon", "Hideout", "Impenetrable Vault", "Invasion of Dreams", "Isolated Refuge", "Military Outpost", "Observatory", "Pilgrimage Site", "Protection of Rare Artifacts", "Secret Meeting Place", "Treasure Horde"] },
+        { label: "Original Use", values: { ref: "purpose.uses" } },
         { label: "Built By", values: ["A Fallen Hero", "A Fanatical Cult", "A Forgotten Empire", "A Long-Dead Poet", "A Militant Order", "A Renowned Alchemist", "A Royal Dynasty", "A Secret Society", "A Tyrannical Ruler", "A Warrior Tribe", "A Wealthy Recluse", "Desperate Rebels", "Heretical Alchemists", "Heretical Monks", "Immoral Sorcerers", "Inverted Astrologers", "Mob Families", "Opulent Merchants", "Pilgrims to a Dead God", "Rogue Scholars"] },
     ],
 };
@@ -11,7 +11,7 @@ export const purpose: Table = {
 export const construction: Table = {
     columns: [
         { label: "Entrance", values: ["A Creature's Lair", "A Dream", "A Massive Tree", "A Well", "An Enormous Grave", "Behind a Waterfall", "Between Menhirs", "Cave", "Center of a Maze", "Cliff door", "Hollow Statue", "Illusory Wall", "Mine Shaft", "Sinking Sand", "Skyward Beam of Light", "Starlight Path", "Through a Painting", "Under a Bridge", "Underwater Tunnel", "Veil of Mist"] },
-        { label: "Composition", values: ["Bone", "Coral", "Crystal", "Earth", "Ethereal Fabric", "Flesh", "Floating Platforms", "Fungi", "Glass", "Ice", "Living Plants", "Marble", "Metal", "Obsidian", "Petrified Wood", "Sand", "Shadow Material", "Stone", "Webs", "Wood"] },
+        { label: "Composition", values: { ref: "construction.kinds" } },
     ],
 };
 
@@ -38,7 +38,6 @@ export const agendas: Table = {
 
 export const monster: Table = {
     columns: [
-        { label: "Group", values: { ref: "bestiary.families" } },
         { label: "Activity", values: ["Building", "Devouring", "Dying", "Fighting", "Growing", "Haunting", "Hiding", "Killing", "Mating", "Mourning", "Patrolling", "Praying", "Protecting", "Recuperating", "Scheming", "Sleeping", "Stalking", "Torturing", "Training", "Trapped"] },
     ],
 };

@@ -14,6 +14,7 @@ export type Config = {
     factionCount: number;
     roomTypes: RoomType[];
     tables: Tables;
+    resolveDetails: boolean;
 };
 
 export const defaultConfig: Config = {
@@ -21,4 +22,5 @@ export const defaultConfig: Config = {
     factionCount: 2,
     roomTypes: defaultRoomTypes,
     tables: { purpose, construction, ruination, traits, agendas },
+    resolveDetails: true,
 };

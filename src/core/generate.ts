@@ -1,8 +1,9 @@
 import type { Denizens, Dungeon, Faction, History, Overrides, Table, Room, RoomType } from "../types/rollTypes.ts";
 import {makeChildRng, pickWeighted, type Rng} from "./rng.ts";
-import { rollTable, rollOne } from "./rolls.ts";
+import { rollTable, rollOne, rollValueWithCount, selectDetail } from "./rolls.ts";
 import {groupNames, monstersByGroup} from "./data/monsters.ts";
 import {dressing} from "./data/dressing.ts";
+import {roomContext} from "./context.ts";
 import { type Config, defaultConfig, type Tables } from "./config.ts";
 import { generateMap } from "./map.ts";
 
@@ -30,12 +31,9 @@ function generateFactions(seed: string, agendas: Table, count: number, overrides
     const factions: Faction[] = [];
     for (let i = 0; i < count; i++) {
         const group = rollOne(seed, groupNames, `faction.${i}.group`, overrides);
-        const roster = monstersByGroup[group.value] ?? [];
-        const species = rollOne(seed, roster, `faction.${i}.species`, overrides);
         const strength = makeChildRng(seed, `faction.${i}.strength`).die(FACTION_STRENGTH_SIDES);
         factions.push({
             group,
-            species,
             strength,
             agenda: rollTable(seed, agendas, `faction.${i}.agenda`, overrides),
         });
@@ -43,27 +41,10 @@ function generateFactions(seed: string, agendas: Table, count: number, overrides
     return factions;
 }
 
-// The strongest faction; its species is the fallback denizen for unaligned rooms.
-// Ties resolve to the lowest index so the result stays deterministic.
-export function dominantFactionIndex(factions: Faction[]): number | null {
-    if (factions.length === 0) return null;
-    let best = 0;
-    for (let i = 1; i < factions.length; i++) {
-        if (factions[i].strength > factions[best].strength) best = i;
-    }
-    return best;
-}
 
 // Returns a faction index, or null for the unaligned remainder.
-function sampleOccupantIndex(
-    seed: string,
-    roomId: number,
-    factions: Faction[],
-    count: number,
-): number | null {
-    const label = count > 0 ? `room.${roomId}.occupant#${count}` : `room.${roomId}.occupant`;
+function sampleOccupantOnce(seed: string, factions: Faction[], label: string): number | null {
     const rng = makeChildRng(seed, label);
-
     const total = factions.reduce((sum, f) => sum + f.strength, 0) + UNALIGNED_WEIGHT;
     let r = rng.int(total);
     for (let i = 0; i < factions.length; i++) {
@@ -71,6 +52,24 @@ function sampleOccupantIndex(
         r -= factions[i].strength;
     }
     return null; // fell into the unaligned slice
+}
+
+// A faction index or null (unaligned).
+function sampleOccupantIndex(
+    seed: string,
+    roomId: number,
+    factions: Faction[],
+    count: number,
+): number | null {
+    const base = `room.${roomId}.occupant`;
+    if (count === 0) return sampleOccupantOnce(seed, factions, base);
+
+    const previous = sampleOccupantIndex(seed, roomId, factions, count - 1);
+    for (let t = 0; t < MAX_TYPE_REROLL_TRIES; t++) {
+        const candidate = sampleOccupantOnce(seed, factions, `${base}#${count}.${t}`);
+        if (candidate !== previous) return candidate;
+    }
+    return previous; // give up: only one possible outcome
 }
 
 function roomTypeAtCount(seed: string, pool: RoomType[], roomId: number, count: number): RoomType {
@@ -108,27 +107,22 @@ function generateRooms(
 
         // The monster room's first column is the family (a ref to the bestiary).
         if (rt.name === "Monster") {
-            const familyEdited = overrides[`room.${id}.col.0`]?.editValue !== undefined;
-            // A hand-typed family detaches the room from factions. Otherwise its
-            // allegiance is sampled from its own slot, so rerolling allegiance and
-            // rerolling the family are independent actions.
-            if (!familyEdited) {
-                const occCount = overrides[`room.${id}.occupant`]?.rerollCount ?? 0;
-                const idx = sampleOccupantIndex(seed, id, factions, occCount);
-                if (idx !== null) {
-                    roll.cells[0].value = factions[idx].group.value;  // aligned: family follows the faction
-                    room.occupantFaction = idx;
-                }
-                // idx === null -> unaligned, keep the family rolled into cells[0]
+            const occCount = overrides[`room.${id}.occupant`]?.rerollCount ?? 0;
+            const idx = sampleOccupantIndex(seed, id, factions, occCount);
+            const creatureCount = overrides[`room.${id}.monster`]?.rerollCount ?? 0;
+
+            let family: string;
+            if (idx !== null) {
+                room.occupantFaction = idx;
+                family = factions[idx].group.value; // aligned: the faction's family (fixed)
+            } else {
+                family = rollValueWithCount(seed, groupNames, `room.${id}.family`, creatureCount);
             }
-            const roster = monstersByGroup[roll.cells[0].value];
-            if (roster) {
-                room.monster = rollOne(seed, roster, `room.${id}.monster`, overrides);
-            }
+            room.family = family;
+            const roster = monstersByGroup[family] ?? [];
+            room.monster = rollOne(seed, roster, `room.${id}.monster`, overrides);
         }
 
-        // One base-tier dressing line per room (blind roll for now).
-        room.details = [rollOne(seed, dressing, `room.${id}.detail.0`, overrides)];
 
         rooms.push(room);
     }
@@ -142,5 +136,13 @@ export function generate(seed: string, config: Config = defaultConfig, overrides
     const rooms = generateRooms(seed, config.roomTypes, config.roomCount, overrides, factions);
     const map = generateMap(makeChildRng(seed, "map"), rooms, overrides);
 
-    return { seed, history, denizens, factions, rooms, map };
+    const dungeon: Dungeon = { seed, history, denizens, factions, rooms, map };
+
+    // Details chosen last, against each room's full context.
+    for (const room of rooms) {
+        const context = roomContext(dungeon, room);
+        room.details = [selectDetail(seed, dressing, context, `room.${room.id}.detail.0`, overrides)];
+    }
+
+    return dungeon;
 }

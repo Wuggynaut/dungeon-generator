@@ -1,9 +1,14 @@
 import type { ColumnValues } from "../../types/rollTypes.ts";
 import { groupNames } from "./monsters.ts";
+import { purposeValues } from "./purposeTags.ts";
+import { constructionValues } from "./constructionKind.ts";
 
 // Named lists that a table column can reference instead of storing its own copy.
+// A column with `{ ref: "bestiary.families" }` resolves to the live family list
 const registry: Record<string, () => string[]> = {
     "bestiary.families": () => groupNames,
+    "purpose.uses": () => purposeValues,
+    "construction.kinds": () => constructionValues,
 };
 
 export function refExists(ref: string): boolean {

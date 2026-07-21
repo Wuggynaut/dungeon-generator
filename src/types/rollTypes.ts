@@ -12,6 +12,13 @@ export type RoomType = {
     table: Table;
 };
 
+export type Detail = {
+    text: string;
+    requires?: string[];
+    affinity?: string[];
+    weight?: number;
+};
+
 export type Species = { name: string; tags: string[] };
 
 export type Family = { name: string; tags: string[]; species: Species[] };
@@ -47,8 +54,7 @@ export type Denizens = {
 };
 
 export type Faction = {
-    group: Slot;
-    species: Slot;   // drawn from the group's family roster
+    group: Slot;   // the faction's family = its "Type" (may be a single-species family)
     strength: number;
     agenda: Roll;
 };
@@ -57,7 +63,8 @@ export type Room = {
     id: number;
     type: string;
     roll: Roll;
-    monster?: Slot; // specific monster; only set for rooms whose group is in the bestiary
+    monster?: Slot; // the species shown for a monster room
+    family?: string; // which family the species was drawn from (not shown to user)
     occupantFaction?: number; // index into dungeon.factions; absent = unaligned or non-monster room
     details?: Slot[]; // rolled dressing lines; slot ids are room.<id>.detail.<n>
 };

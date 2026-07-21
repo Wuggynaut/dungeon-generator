@@ -2,6 +2,7 @@ import type { Room, SlotControls } from "../types/rollTypes.ts";
 import RollView from "./RollView.tsx";
 import { IconButton } from "./IconButton.tsx";
 import { DiceIcon } from "./icons/DiceIcon.tsx";
+import { monstersByGroup } from "../core/data/monsters.ts";
 import styles from "./RoomList.module.css";
 
 type RoomListProps = {
@@ -49,21 +50,16 @@ export function RoomList({ rooms, numberByRoomId, selected, onSelect, controls }
                             if (!isMonster) {
                                 return <RollView roll={room.roll} controls={controls} extras={details} />;
                             }
-                            // Family is shown as a control only when unaligned; an aligned
-                            // room's family follows its faction, changed via allegiance.
                             const unaligned = room.occupantFaction === undefined;
-                            const extras = [
-                                ...(unaligned ? [{ label: "Family", slot: room.roll.cells[0] }] : []),
-                                ...(details ?? []),
-                            ];
+                            const speciesRerollable =
+                                unaligned || (monstersByGroup[room.family ?? ""]?.length ?? 0) > 1;
                             return (
                                 <>
                                     <RollView
                                         roll={room.roll}
                                         controls={controls}
-                                        hiddenColumns={[0]}
-                                        extra={{ label: "Species", slot: room.monster! }}
-                                        extras={extras}
+                                        extra={{ label: "Species", slot: room.monster!, rerollable: speciesRerollable }}
+                                        extras={details}
                                     />
                                     <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.85em", opacity: 0.8 }}>
                                         <span>{unaligned ? "Unaligned" : `Held by Faction ${room.occupantFaction! + 1}`}</span>

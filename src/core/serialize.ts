@@ -1,6 +1,6 @@
 import type {Dungeon, Roll} from "../types/rollTypes.ts";
 import type {PathType} from "../types/mapTypes.ts";
-import {dominantFactionIndex} from "./generate.ts";
+import {dominantFactionIndex} from "./context.ts";
 
 type Notes = Record<string, string>;
 
@@ -52,7 +52,7 @@ function roomsSection(dungeon: Dungeon): string {
         const identity = isMonster
             ? [
                 `- Species: ${room.monster!.value}`,
-                `- ${room.roll.columns[1]}: ${room.roll.cells[1].value}`,
+                `- ${room.roll.columns[0]}: ${room.roll.cells[0].value}`,
             ]
             : room.roll.columns.map((label, i) => `- ${label}: ${room.roll.cells[i].value}`);
         const body = [
@@ -95,10 +95,9 @@ export function serializeMarkdown(dungeon: Dungeon, notes: Notes = {}): string {
     blocks.push(section(
         "Factions",
         "What is each faction trying to achieve, and what stands in their way?",
-        dungeon.factions.map((f, i) => {
-            const face = f.group.value !== f.species.value ? `${f.species.value}, ${f.group.value}` : f.species.value;
-            return `${rollLine(`Faction ${i + 1}`, f.agenda)} (${face}; strength ${f.strength}${i === dominant ? ", dominant" : ""})`;
-        }),
+        dungeon.factions.map((f, i) =>
+            `${rollLine(`Faction ${i + 1}`, f.agenda)} (Type: ${f.group.value}; strength ${f.strength}${i === dominant ? ", dominant" : ""})`
+        ),
         noteBlock(notes, "notes.factions"),
     ));
 

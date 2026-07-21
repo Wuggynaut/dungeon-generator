@@ -68,18 +68,26 @@ const quote = (value: string) => JSON.stringify(value);
 const literalColumn = (label: string, values: string[]) =>
     `    { label: ${quote(label)}, values: [${values.map(quote).join(", ")}] },`;
 
+const refColumn = (label: string, ref: string) =>
+    `    { label: ${quote(label)}, values: { ref: ${quote(ref)} } },`;
+
+// Columns whose values live in a source module (with their tags), referenced so
+// the list is not copied into the generated table.
+const REF_COLUMNS: Record<string, Record<string, string>> = {
+    purpose: { "Original Use": "purpose.uses" },
+    construction: { "Composition": "construction.kinds" },
+};
+
 const constOf = (name: string, table: RawTable) => {
-    // The monster table's family column references the bestiary instead of copying it.
-    const columns =
-        name === "monster"
-            ? [
-                `    { label: ${quote(table.columns[0])}, values: { ref: "bestiary.families" } },`,
-                literalColumn(table.columns[1], table.rows.map((r) => r[1])),
-            ]
-            : [
-                literalColumn(table.columns[0], table.rows.map((r) => r[0])),
-                literalColumn(table.columns[1], table.rows.map((r) => r[1])),
-            ];
+    const refs = REF_COLUMNS[name] ?? {};
+    const col = (ci: number) => {
+        const label = table.columns[ci];
+        return refs[label]
+            ? refColumn(label, refs[label])
+            : literalColumn(label, table.rows.map((r) => r[ci]));
+    };
+    // The monster table keeps only Activity; family is chosen in generate.ts.
+    const columns = name === "monster" ? [col(1)] : [col(0), col(1)];
     return [`export const ${name}: Table = {`, `  columns: [`, ...columns, `  ],`, `};`, ``].join("\n");
 };
 
