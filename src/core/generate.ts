@@ -1,32 +1,32 @@
-import type { Denizens, Dungeon, Faction, History, Overrides, PairedTable, Room, RoomType } from "../types/rollTypes.ts";
+import type { Denizens, Dungeon, Faction, History, Overrides, Table, Room, RoomType } from "../types/rollTypes.ts";
 import {makeChildRng, pickWeighted, type Rng} from "./rng.ts";
-import { rollSlots, rollOne } from "./rolls.ts";
+import { rollTable, rollOne } from "./rolls.ts";
 import {groupNames, monstersByGroup} from "./data/monsters.ts";
+import {dressing} from "./data/dressing.ts";
 import { type Config, defaultConfig, type Tables } from "./config.ts";
 import { generateMap } from "./map.ts";
-import {dressing} from "./data/dressing.ts";
 
 const MAX_TYPE_REROLL_TRIES = 50;
 const UNALIGNED_WEIGHT = 1; // How likely a monster room belongs to no faction, relative to one faction's strength
 
 function generateHistory(seed: string, tables: Tables, overrides: Overrides): History {
     return {
-        purpose:      rollSlots(seed, tables.purpose,      "history.purpose",      overrides),
-        construction: rollSlots(seed, tables.construction, "history.construction", overrides),
-        ruination:    rollSlots(seed, tables.ruination,    "history.ruination",    overrides),
+        purpose:      rollTable(seed, tables.purpose,      "history.purpose",      overrides),
+        construction: rollTable(seed, tables.construction, "history.construction", overrides),
+        ruination:    rollTable(seed, tables.ruination,    "history.ruination",    overrides),
     };
 }
 
 function generateDenizens(seed: string, tables: Tables, overrides: Overrides): Denizens {
     return {
-        attitude:    rollSlots(seed, tables.traits, "denizens.attitude",    overrides),
-        standoutNPC: rollSlots(seed, tables.traits, "denizens.standoutNPC", overrides),
+        attitude:    rollTable(seed, tables.traits, "denizens.attitude",    overrides),
+        standoutNPC: rollTable(seed, tables.traits, "denizens.standoutNPC", overrides),
     };
 }
 
 const FACTION_STRENGTH_SIDES = 3; // strength is 1..3; it weights room occupancy and names the dominant denizen
 
-function generateFactions(seed: string, agendas: PairedTable, count: number, overrides: Overrides): Faction[] {
+function generateFactions(seed: string, agendas: Table, count: number, overrides: Overrides): Faction[] {
     const factions: Faction[] = [];
     for (let i = 0; i < count; i++) {
         const group = rollOne(seed, groupNames, `faction.${i}.group`, overrides);
@@ -37,7 +37,7 @@ function generateFactions(seed: string, agendas: PairedTable, count: number, ove
             group,
             species,
             strength,
-            agenda: rollSlots(seed, agendas, `faction.${i}.agenda`, overrides),
+            agenda: rollTable(seed, agendas, `faction.${i}.agenda`, overrides),
         });
     }
     return factions;
@@ -103,28 +103,30 @@ function generateRooms(
     for (let id = 1; id <= count; id++) {
         const typeCount = overrides[`room.${id}.type`]?.rerollCount ?? 0;
         const rt = roomTypeAtCount(seed, pool, id, typeCount);
-        const roll = rollSlots(seed, rt.table, `room.${id}`, overrides);
+        const roll = rollTable(seed, rt.table, `room.${id}`, overrides);
         const room: Room = { id, type: rt.name, roll };
 
-        // Only the monster table produces known group names in its left column.
-        const isMonsterRoom = monstersByGroup[roll.left.value] !== undefined;
-        if (isMonsterRoom) {
-            const leftOverride = overrides[`room.${id}.left`];
-            // A hand-typed group wins outright; otherwise the occupant decides.
-            if (leftOverride?.editValue === undefined) {
-                const rerollCount = leftOverride?.rerollCount ?? 0;
-                const idx = sampleOccupantIndex(seed, id, factions, rerollCount);
+        // The monster room's first column is the family (a ref to the bestiary).
+        if (rt.name === "Monster") {
+            const familyEdited = overrides[`room.${id}.col.0`]?.editValue !== undefined;
+            // A hand-typed family detaches the room from factions. Otherwise its
+            // allegiance is sampled from its own slot, so rerolling allegiance and
+            // rerolling the family are independent actions.
+            if (!familyEdited) {
+                const occCount = overrides[`room.${id}.occupant`]?.rerollCount ?? 0;
+                const idx = sampleOccupantIndex(seed, id, factions, occCount);
                 if (idx !== null) {
-                    roll.left.value = factions[idx].group.value;  // inherit the faction's group
+                    roll.cells[0].value = factions[idx].group.value;  // aligned: family follows the faction
                     room.occupantFaction = idx;
                 }
-                // idx === null -> unaligned, leave the normally-rolled group in place
+                // idx === null -> unaligned, keep the family rolled into cells[0]
             }
-            const roster = monstersByGroup[roll.left.value];
+            const roster = monstersByGroup[roll.cells[0].value];
             if (roster) {
                 room.monster = rollOne(seed, roster, `room.${id}.monster`, overrides);
             }
         }
+
         // One base-tier dressing line per room (blind roll for now).
         room.details = [rollOne(seed, dressing, `room.${id}.detail.0`, overrides)];
 

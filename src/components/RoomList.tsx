@@ -43,17 +43,40 @@ export function RoomList({ rooms, numberByRoomId, selected, onSelect, controls }
                                 </IconButton>
                             </span>
                         </div>
-                        {room.occupantFaction !== undefined && (
-                            <div style={{ fontSize: "0.85em", opacity: 0.8 }}>
-                                Faction: {room.occupantFaction + 1}
-                            </div>
-                        )}
-                        <RollView
-                            roll={room.roll}
-                            controls={controls}
-                            extra={room.monster ? { label: "Monster", slot: room.monster } : undefined}
-                            extras={room.details?.map(d => ({ label: "Detail", slot: d }))}
-                        />
+                        {(() => {
+                            const details = room.details?.map(d => ({ label: "Detail", slot: d }));
+                            const isMonster = room.type === "Monster" && room.monster !== undefined;
+                            if (!isMonster) {
+                                return <RollView roll={room.roll} controls={controls} extras={details} />;
+                            }
+                            // Family is shown as a control only when unaligned; an aligned
+                            // room's family follows its faction, changed via allegiance.
+                            const unaligned = room.occupantFaction === undefined;
+                            const extras = [
+                                ...(unaligned ? [{ label: "Family", slot: room.roll.cells[0] }] : []),
+                                ...(details ?? []),
+                            ];
+                            return (
+                                <>
+                                    <RollView
+                                        roll={room.roll}
+                                        controls={controls}
+                                        hiddenColumns={[0]}
+                                        extra={{ label: "Species", slot: room.monster! }}
+                                        extras={extras}
+                                    />
+                                    <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.85em", opacity: 0.8 }}>
+                                        <span>{unaligned ? "Unaligned" : `Held by Faction ${room.occupantFaction! + 1}`}</span>
+                                        <IconButton
+                                            label="Reroll allegiance"
+                                            onClick={e => { e.stopPropagation(); controls.reroll(`room.${room.id}.occupant`); }}
+                                        >
+                                            <DiceIcon />
+                                        </IconButton>
+                                    </div>
+                                </>
+                            );
+                        })()}
                     </li>
                 ))}
             </ul>

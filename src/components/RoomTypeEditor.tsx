@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Config } from "../core/config.ts";
-import type { PairedTable, RoomType } from "../types/rollTypes.ts";
+import type { Table, RoomType } from "../types/rollTypes.ts";
 import { TableEditor } from "./TableEditor.tsx";
 import { NumberStepper } from "./NumberStepper.tsx";
 import { IconButton } from "./IconButton.tsx";
@@ -24,8 +24,8 @@ function cumulativeRanges(pool: RoomType[]): { lo: number; hi: number }[] {
     return ranges;
 }
 
-function starterTable(): PairedTable {
-    return { columns: ["Column A", "Column B"], rows: [["", ""]] };
+function starterTable(): Table {
+    return { columns: [{ label: "Column A", values: [""] }, { label: "Column B", values: [""] }] };
 }
 
 export function RoomTypeEditor({ config, onChange }: RoomTypeEditorProps) {
@@ -41,7 +41,7 @@ export function RoomTypeEditor({ config, onChange }: RoomTypeEditorProps) {
         onChange({ ...config, roomTypes: next });
     };
 
-    const setTable = (index: number, table: PairedTable) => {
+    const setTable = (index: number, table: Table) => {
         const next = pool.map((rt, i) => (i === index ? { ...rt, table } : rt));
         onChange({ ...config, roomTypes: next });
     };
@@ -85,7 +85,7 @@ export function RoomTypeEditor({ config, onChange }: RoomTypeEditorProps) {
                             </span>
 
                             <span className={styles.meta}>
-                                {rt.table.columns[0]} × {rt.table.columns[1]} · {rt.table.rows.length} rows
+                                {rt.table.columns.map(c => c.label).join(" × ")} · {rt.table.columns.length} cols
                             </span>
 
                             <span className={styles.actions}>

@@ -1,37 +1,65 @@
 import type { Family } from "../../types/rollTypes.ts";
 
-// The bestiary: families of creatures, each holding the species that belong to it.
+// New family-based bestiary: A family is a set of creatures that could plausibly
+// band together or share a lair. Solitary creatures are families of one.
+// Family.tags apply to every member; Species.tags distinguish a member.
 
 export const bestiary: Family[] = [
-    { name: "Avian", tags: [], species: [{ name: "Phoenix", tags: [] }, { name: "Roc", tags: [] }, { name: "Wyvern", tags: [] }] },
-    { name: "Beast", tags: [], species: [{ name: "Blood Elk", tags: [] }, { name: "Grizzly Bear", tags: [] }, { name: "Killer Bees", tags: [] }, { name: "Night Cat", tags: [] }, { name: "Viper", tags: [] }, { name: "Wolf", tags: [] }] },
-    { name: "Behemoth", tags: [], species: [{ name: "Green Dragon", tags: [] }, { name: "Purple Worm", tags: [] }] },
-    { name: "Construct", tags: [], species: [{ name: "Bone Construct", tags: [] }, { name: "Cobblehounds", tags: [] }, { name: "Gargoyle", tags: [] }] },
-    { name: "Demon", tags: [], species: [{ name: "Hellhound", tags: [] }, { name: "Nightmare", tags: [] }] },
-    { name: "Extraplanar", tags: [], species: [{ name: "Eye of Terror", tags: [] }, { name: "Mind Lasher", tags: [] }] },
-    { name: "Fey", tags: [], species: [{ name: "Boggart", tags: [] }, { name: "Dryad", tags: [] }, { name: "Frost Elf", tags: [] }, { name: "Pixie", tags: [] }, { name: "Red Cap", tags: [] }, { name: "Night Hag", tags: [] }, { name: "Sea Hag", tags: [] }, { name: "Will-o-Wisp", tags: [] }] },
-    { name: "Giant", tags: [], species: [{ name: "Ettin", tags: [] }, { name: "Sky Giant", tags: [] }, { name: "Storm Giant", tags: [] }, { name: "Titan", tags: [] }] },
-    { name: "Goblinoid", tags: [], species: [{ name: "Bugbear", tags: [] }, { name: "Goblin", tags: [] }, { name: "Hobgoblin", tags: [] }, { name: "Ogre", tags: [] }, { name: "Root Goblin", tags: [] }, { name: "Troll", tags: [] }, { name: "Wood Troll", tags: [] }] },
-    { name: "Humanoid", tags: [], species: [{ name: "Acolyte", tags: [] }, { name: "Bandit", tags: [] }, { name: "Gnoll", tags: [] }, { name: "Hooded Men", tags: [] }, { name: "Triton", tags: [] }] },
-    { name: "Hybrid", tags: [], species: [{ name: "Centaur", tags: [] }, { name: "Manticore", tags: [] }, { name: "Minotaur", tags: [] }, { name: "Owlbear", tags: [] }] },
-    { name: "Incorporeal", tags: [], species: [{ name: "Invisible Stalker", tags: [] }, { name: "Shadow", tags: [] }] },
-    { name: "Insectoid", tags: [], species: [{ name: "Aranea", tags: [] }, { name: "Burrowing Horror", tags: [] }, { name: "Cave Locust", tags: [] }, { name: "Giant Scorpion", tags: [] }] },
-    { name: "Lizard", tags: [], species: [{ name: "Basilisk", tags: [] }, { name: "Hydra", tags: [] }, { name: "Kobold", tags: [] }, { name: "Naga", tags: [] }, { name: "Reptilian", tags: [] }] },
-    { name: "Magical", tags: [], species: [{ name: "Blink Dog", tags: [] }, { name: "Warp Panther", tags: [] }, { name: "Water Elemental", tags: [] }] },
-    { name: "Mythical", tags: [], species: [{ name: "Banshee", tags: [] }, { name: "Griffon", tags: [] }, { name: "Harpy", tags: [] }, { name: "Hydra", tags: [] }, { name: "Lamia", tags: [] }, { name: "Unicorn", tags: [] }] },
-    { name: "Plant", tags: [], species: [{ name: "Creeping Vines", tags: [] }, { name: "Root Witch", tags: [] }, { name: "Shambling Mound", tags: [] }, { name: "Treant", tags: [] }] },
-    { name: "Shape Shifter", tags: [], species: [{ name: "Swine Thing", tags: [] }, { name: "Werewolf", tags: [] }] },
-    { name: "Undead", tags: [], species: [{ name: "Crypt Guardian", tags: [] }, { name: "Ghost", tags: [] }, { name: "Ghoul", tags: [] }, { name: "Lich", tags: [] }, { name: "Mummy", tags: [] }, { name: "Skeleton", tags: [] }, { name: "Vampire", tags: [] }, { name: "Wight", tags: [] }, { name: "Zombie", tags: [] }] },
-    { name: "Unusual", tags: [], species: [{ name: "Gelatinous Ooze", tags: [] }, { name: "Mimic", tags: [] }, { name: "Rust Monster", tags: [] }, { name: "Warrior Snail", tags: [] }] },
+    { name: "Goblinoid", tags: ["goblinoid", "savage"], species: [{ name: "Bugbear", tags: [] }, { name: "Goblin", tags: [] }, { name: "Hobgoblin", tags: [] }, { name: "Ogre", tags: [] }, { name: "Root Goblin", tags: ["forest"] }, { name: "Troll", tags: ["regenerating"] }, { name: "Wood Troll", tags: ["forest", "regenerating"] }] },
+    { name: "Undead", tags: ["undead"], species: [{ name: "Skeleton", tags: [] }, { name: "Zombie", tags: [] }, { name: "Ghoul", tags: [] }, { name: "Wight", tags: [] }, { name: "Mummy", tags: [] }, { name: "Vampire", tags: [] }, { name: "Lich", tags: ["spellcaster"] }, { name: "Crypt Guardian", tags: ["guardian"] }, { name: "Ghost", tags: ["spectral", "incorporeal"] }, { name: "Banshee", tags: ["spectral", "incorporeal"] }, { name: "Shadow", tags: ["spectral", "incorporeal"] }] },
+    { name: "Construct", tags: ["construct", "artificial"], species: [{ name: "Bone Construct", tags: [] }, { name: "Cobblehounds", tags: [] }, { name: "Gargoyle", tags: [] }] },
+    { name: "Vermin", tags: ["arthropod", "vermin"], species: [{ name: "Burrowing Horror", tags: ["burrower"] }, { name: "Cave Locust", tags: ["swarm"] }, { name: "Giant Scorpion", tags: ["venomous"] }] },
+    { name: "Arachnid", tags: ["arthropod", "arachnid"], species: [{ name: "Aranea", tags: ["shapeshifter", "web-builder"] }] },
+    { name: "Fey", tags: ["fey"], species: [{ name: "Boggart", tags: ["shapeshifter"] }, { name: "Pixie", tags: [] }, { name: "Red Cap", tags: ["savage"] }, { name: "Will-o-Wisp", tags: ["spectral"] }, { name: "Dryad", tags: ["plant", "forest"] }] },
+    { name: "Hags", tags: ["fey", "hag"], species: [{ name: "Night Hag", tags: ["fiend"] }, { name: "Sea Hag", tags: ["aquatic"] }] },
+    { name: "Humanfolk", tags: ["humanoid"], species: [{ name: "Acolyte", tags: ["spellcaster"] }, { name: "Bandit", tags: [] }, { name: "Hooded Men", tags: ["cultist"] }] },
+    { name: "Giant", tags: ["giant"], species: [{ name: "Ettin", tags: [] }, { name: "Sky Giant", tags: [] }, { name: "Storm Giant", tags: ["cold"] }] },
+    { name: "Plant", tags: ["plant", "forest"], species: [{ name: "Creeping Vines", tags: [] }, { name: "Root Witch", tags: ["fey"] }, { name: "Shambling Mound", tags: [] }, { name: "Treant", tags: [] }] },
+    { name: "Shapeshifter", tags: ["shapeshifter"], species: [{ name: "Swine Thing", tags: [] }, { name: "Werewolf", tags: ["beast"] }] },
+    { name: "Elemental", tags: ["elemental"], species: [{ name: "Water Elemental", tags: ["aquatic"] }, { name: "Invisible Stalker", tags: ["air", "incorporeal"] }] },
+    { name: "Aberration", tags: ["aberration"], species: [{ name: "Eye of Terror", tags: [] }, { name: "Mind Lasher", tags: ["psionic"] }] },
+    { name: "Fiend", tags: ["fiend", "infernal"], species: [{ name: "Hellhound", tags: ["fire"] }, { name: "Nightmare", tags: ["fire"] }] },
+    // solitary families (one species each)
+    { name: "Phoenix", tags: ["avian", "winged", "fire", "mythic"], species: [{ name: "Phoenix", tags: [] }] },
+    { name: "Roc", tags: ["avian", "winged", "giant"], species: [{ name: "Roc", tags: [] }] },
+    { name: "Wyvern", tags: ["avian", "winged", "draconic"], species: [{ name: "Wyvern", tags: [] }] },
+    { name: "Grizzly Bear", tags: ["beast"], species: [{ name: "Grizzly Bear", tags: [] }] },
+    { name: "Night Cat", tags: ["beast"], species: [{ name: "Night Cat", tags: [] }] },
+    { name: "Viper", tags: ["beast", "serpentine"], species: [{ name: "Viper", tags: [] }] },
+    { name: "Blood Elk", tags: ["beast"], species: [{ name: "Blood Elk", tags: [] }] },
+    { name: "Killer Bees", tags: ["beast", "swarm", "arthropod"], species: [{ name: "Killer Bees", tags: [] }] },
+    { name: "Wolf", tags: ["beast", "pack"], species: [{ name: "Wolf", tags: [] }] },
+    { name: "Green Dragon", tags: ["draconic", "colossal", "mythic"], species: [{ name: "Green Dragon", tags: [] }] },
+    { name: "Purple Worm", tags: ["colossal", "burrower"], species: [{ name: "Purple Worm", tags: [] }] },
+    { name: "Titan", tags: ["giant", "divine", "mythic"], species: [{ name: "Titan", tags: [] }] },
+    { name: "Frost Elf", tags: ["fey", "cold", "humanoid"], species: [{ name: "Frost Elf", tags: [] }] },
+    { name: "Gnoll", tags: ["humanoid", "savage", "pack"], species: [{ name: "Gnoll", tags: [] }] },
+    { name: "Triton", tags: ["humanoid", "aquatic"], species: [{ name: "Triton", tags: [] }] },
+    { name: "Centaur", tags: ["hybrid", "humanoid"], species: [{ name: "Centaur", tags: [] }] },
+    { name: "Manticore", tags: ["hybrid", "beast", "winged"], species: [{ name: "Manticore", tags: [] }] },
+    { name: "Minotaur", tags: ["hybrid", "savage"], species: [{ name: "Minotaur", tags: [] }] },
+    { name: "Owlbear", tags: ["hybrid", "beast"], species: [{ name: "Owlbear", tags: [] }] },
+    { name: "Basilisk", tags: ["reptilian", "beast", "petrifying", "mythic"], species: [{ name: "Basilisk", tags: [] }] },
+    { name: "Hydra", tags: ["reptilian", "serpentine", "mythic"], species: [{ name: "Hydra", tags: [] }] },
+    { name: "Kobold", tags: ["reptilian", "draconic", "humanoid"], species: [{ name: "Kobold", tags: [] }] },
+    { name: "Naga", tags: ["reptilian", "serpentine"], species: [{ name: "Naga", tags: [] }] },
+    { name: "Reptilian", tags: ["reptilian", "humanoid"], species: [{ name: "Reptilian", tags: [] }] },
+    { name: "Blink Dog", tags: ["beast", "fey", "teleporter", "pack"], species: [{ name: "Blink Dog", tags: [] }] },
+    { name: "Warp Panther", tags: ["beast", "teleporter"], species: [{ name: "Warp Panther", tags: [] }] },
+    { name: "Griffon", tags: ["avian", "winged", "beast", "mythic"], species: [{ name: "Griffon", tags: [] }] },
+    { name: "Harpy", tags: ["avian", "winged", "mythic"], species: [{ name: "Harpy", tags: [] }] },
+    { name: "Lamia", tags: ["monstrous", "mythic"], species: [{ name: "Lamia", tags: [] }] },
+    { name: "Unicorn", tags: ["beast", "fey", "mythic"], species: [{ name: "Unicorn", tags: [] }] },
+    { name: "Gelatinous Ooze", tags: ["ooze", "mindless"], species: [{ name: "Gelatinous Ooze", tags: [] }] },
+    { name: "Mimic", tags: ["aberration", "shapeshifter", "ambusher"], species: [{ name: "Mimic", tags: [] }] },
+    { name: "Rust Monster", tags: ["aberration", "vermin"], species: [{ name: "Rust Monster", tags: [] }] },
+    { name: "Warrior Snail", tags: ["beast", "armored"], species: [{ name: "Warrior Snail", tags: [] }] },
 ];
 
-// Derived lookups. These follow `bestiary`; do not edit them by hand.
 export const groupNames: string[] = bestiary.map(f => f.name);
 
 export const familyByName: Record<string, Family> =
     Object.fromEntries(bestiary.map(f => [f.name, f]));
 
-// Species names only, keyed by family. Used to roll a species: the roll stores a
-// name string, and tags are looked up from `familyByName` at read time.
 export const monstersByGroup: Record<string, string[]> =
     Object.fromEntries(bestiary.map(f => [f.name, f.species.map(s => s.name)]));

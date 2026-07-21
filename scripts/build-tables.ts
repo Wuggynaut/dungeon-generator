@@ -46,7 +46,7 @@ for (const rows of blocks) {
         };
     }
 
-    // Die Drop: turn each room kind's face count into its default weight.
+        // Die Drop: turn each room kind's face count into its default weight.
     // "2-3" -> 2 faces -> weight 2.
     else if (header[0] === "d6" && header[1] === "Room") {
         for (const [face, kind] of rows.slice(1)) {
@@ -65,11 +65,23 @@ for (const rows of blocks) {
 // emit
 const quote = (value: string) => JSON.stringify(value);
 
-const constOf = (name: string, table: RawTable) =>
-    `export const ${name}: PairedTable = {\n` +
-    `  columns: [${quote(table.columns[0])}, ${quote(table.columns[1])}],\n` +
-    `  rows: [\n${table.rows.map(([left, right]) => `    [${quote(left)}, ${quote(right)}],`).join("\n")}\n  ],\n` +
-    `};\n`;
+const literalColumn = (label: string, values: string[]) =>
+    `    { label: ${quote(label)}, values: [${values.map(quote).join(", ")}] },`;
+
+const constOf = (name: string, table: RawTable) => {
+    // The monster table's family column references the bestiary instead of copying it.
+    const columns =
+        name === "monster"
+            ? [
+                `    { label: ${quote(table.columns[0])}, values: { ref: "bestiary.families" } },`,
+                literalColumn(table.columns[1], table.rows.map((r) => r[1])),
+            ]
+            : [
+                literalColumn(table.columns[0], table.rows.map((r) => r[0])),
+                literalColumn(table.columns[1], table.rows.map((r) => r[1])),
+            ];
+    return [`export const ${name}: Table = {`, `  columns: [`, ...columns, `  ],`, `};`, ``].join("\n");
+};
 
 const consts = Object.entries(paired)
     .map(([name, table]) => constOf(name, table))
@@ -82,7 +94,7 @@ const pool = Object.entries(weights)
 
 const out =
     `// AUTO-GENERATED from ${input.split("/").pop()} by build-tables.ts. Do not edit by hand.\n` +
-    `import type { PairedTable, RoomType } from "../../types/types.ts";\n\n` +
+    `import type { Table, RoomType } from "../../types/rollTypes.ts";\n\n` +
     `${consts}\n` +
     `// Default room-type pool. Weight = faces on the die; total weight is the die size.\n` +
     `export const defaultRoomTypes: RoomType[] = [\n${pool}\n];\n`;

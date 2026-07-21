@@ -1,241 +1,70 @@
 // AUTO-GENERATED from Dungeon_Seeds.md by build-tables.ts. Do not edit by hand.
-import type { PairedTable, RoomType } from "../../types/rollTypes.ts";
+import type { Table, RoomType } from "../../types/rollTypes.ts";
 
-export const purpose: PairedTable = {
-    columns: ["Original Use", "Built By"],
-    rows: [
-        ["Ancestral Rites", "A Fallen Hero"],
-        ["Arcane Library", "A Fanatical Cult"],
-        ["Astral Trading Hub", "A Forgotten Empire"],
-        ["Bestial Creations", "A Long-Dead Poet"],
-        ["Breeding Grounds", "A Militant Order"],
-        ["Burial Site", "A Renowned Alchemist"],
-        ["Celestial Observations", "A Royal Dynasty"],
-        ["Covert Experiments", "A Secret Society"],
-        ["Forbidden Trysts", "A Tyrannical Ruler"],
-        ["Forge for a Great Weapon", "A Warrior Tribe"],
-        ["Hideout", "A Wealthy Recluse"],
-        ["Impenetrable Vault", "Desperate Rebels"],
-        ["Invasion of Dreams", "Heretical Alchemists"],
-        ["Isolated Refuge", "Heretical Monks"],
-        ["Military Outpost", "Immoral Sorcerers"],
-        ["Observatory", "Inverted Astrologers"],
-        ["Pilgrimage Site", "Mob Families"],
-        ["Protection of Rare Artifacts", "Opulent Merchants"],
-        ["Secret Meeting Place", "Pilgrims to a Dead God"],
-        ["Treasure Horde", "Rogue Scholars"],
+export const purpose: Table = {
+    columns: [
+        { label: "Original Use", values: ["Ancestral Rites", "Arcane Library", "Astral Trading Hub", "Bestial Creations", "Breeding Grounds", "Burial Site", "Celestial Observations", "Covert Experiments", "Forbidden Trysts", "Forge for a Great Weapon", "Hideout", "Impenetrable Vault", "Invasion of Dreams", "Isolated Refuge", "Military Outpost", "Observatory", "Pilgrimage Site", "Protection of Rare Artifacts", "Secret Meeting Place", "Treasure Horde"] },
+        { label: "Built By", values: ["A Fallen Hero", "A Fanatical Cult", "A Forgotten Empire", "A Long-Dead Poet", "A Militant Order", "A Renowned Alchemist", "A Royal Dynasty", "A Secret Society", "A Tyrannical Ruler", "A Warrior Tribe", "A Wealthy Recluse", "Desperate Rebels", "Heretical Alchemists", "Heretical Monks", "Immoral Sorcerers", "Inverted Astrologers", "Mob Families", "Opulent Merchants", "Pilgrims to a Dead God", "Rogue Scholars"] },
     ],
 };
 
-export const construction: PairedTable = {
-    columns: ["Entrance", "Composition"],
-    rows: [
-        ["A Creature's Lair", "Bone"],
-        ["A Dream", "Coral"],
-        ["A Massive Tree", "Crystal"],
-        ["A Well", "Earth"],
-        ["An Enormous Grave", "Ethereal Fabric"],
-        ["Behind a Waterfall", "Flesh"],
-        ["Between Menhirs", "Floating Platforms"],
-        ["Cave", "Fungi"],
-        ["Center of a Maze", "Glass"],
-        ["Cliff door", "Ice"],
-        ["Hollow Statue", "Living Plants"],
-        ["Illusory Wall", "Marble"],
-        ["Mine Shaft", "Metal"],
-        ["Sinking Sand", "Obsidian"],
-        ["Skyward Beam of Light", "Petrified Wood"],
-        ["Starlight Path", "Sand"],
-        ["Through a Painting", "Shadow Material"],
-        ["Under a Bridge", "Stone"],
-        ["Underwater Tunnel", "Webs"],
-        ["Veil of Mist", "Wood"],
+export const construction: Table = {
+    columns: [
+        { label: "Entrance", values: ["A Creature's Lair", "A Dream", "A Massive Tree", "A Well", "An Enormous Grave", "Behind a Waterfall", "Between Menhirs", "Cave", "Center of a Maze", "Cliff door", "Hollow Statue", "Illusory Wall", "Mine Shaft", "Sinking Sand", "Skyward Beam of Light", "Starlight Path", "Through a Painting", "Under a Bridge", "Underwater Tunnel", "Veil of Mist"] },
+        { label: "Composition", values: ["Bone", "Coral", "Crystal", "Earth", "Ethereal Fabric", "Flesh", "Floating Platforms", "Fungi", "Glass", "Ice", "Living Plants", "Marble", "Metal", "Obsidian", "Petrified Wood", "Sand", "Shadow Material", "Stone", "Webs", "Wood"] },
     ],
 };
 
-export const ruination: PairedTable = {
-    columns: ["Condition", "Cause"],
-    rows: [
-        ["Corpse", "Alchemical Accident"],
-        ["Crumbling", "Ancient Curse"],
-        ["Cursed", "Cataclysmic Flood"],
-        ["Desecrated", "Civil War"],
-        ["Devoured", "Competing Rituals"],
-        ["Displaced", "Consumed by a Beast"],
-        ["Divided", "Disease"],
-        ["Frozen", "Hedonism"],
-        ["Haunted", "Invasion"],
-        ["Infested", "Long-Term Abandonment"],
-        ["Overgrown", "Magic Gone Awry"],
-        ["Overpopulated", "Magical Seal"],
-        ["Petrified", "Natural Disaster"],
-        ["Plundered", "Natural Erosion"],
-        ["Poisoned", "Obfuscation"],
-        ["Scorched", "Overrun with Monsters"],
-        ["Shrouded in Mist", "Sudden Change in Climate"],
-        ["Submerged", "Teleported to Another Realm"],
-        ["Unending", "Turned to Stone"],
-        ["Warped", "Unresolved Spirits"],
+export const ruination: Table = {
+    columns: [
+        { label: "Condition", values: ["Corpse", "Crumbling", "Cursed", "Desecrated", "Devoured", "Displaced", "Divided", "Frozen", "Haunted", "Infested", "Overgrown", "Overpopulated", "Petrified", "Plundered", "Poisoned", "Scorched", "Shrouded in Mist", "Submerged", "Unending", "Warped"] },
+        { label: "Cause", values: ["Alchemical Accident", "Ancient Curse", "Cataclysmic Flood", "Civil War", "Competing Rituals", "Consumed by a Beast", "Disease", "Hedonism", "Invasion", "Long-Term Abandonment", "Magic Gone Awry", "Magical Seal", "Natural Disaster", "Natural Erosion", "Obfuscation", "Overrun with Monsters", "Sudden Change in Climate", "Teleported to Another Realm", "Turned to Stone", "Unresolved Spirits"] },
     ],
 };
 
-export const traits: PairedTable = {
-    columns: ["Virtues", "Vices"],
-    rows: [
-        ["Compassionate", "Absent-Minded"],
-        ["Courageous", "Aloof"],
-        ["Creative", "Critical"],
-        ["Deductive", "Cynical"],
-        ["Honest", "Greedy"],
-        ["Incisive", "Impulsive"],
-        ["Incorruptible", "Inflexible"],
-        ["Individualistic", "Naive"],
-        ["Loyal", "Obstinate"],
-        ["Methodical", "Passive"],
-        ["Polite", "Pedantic"],
-        ["Practical", "Perfectionist"],
-        ["Resilient", "Sarcastic"],
-        ["Scholarly", "Selfish"],
-        ["Self-Sufficient", "Skeptical"],
-        ["Solid", "Stubborn"],
-        ["Studious", "Superficial"],
-        ["Suave", "Unfocused"],
-        ["Unwavering", "Unimaginative"],
-        ["Witty", "Vain"],
+export const traits: Table = {
+    columns: [
+        { label: "Virtues", values: ["Compassionate", "Courageous", "Creative", "Deductive", "Honest", "Incisive", "Incorruptible", "Individualistic", "Loyal", "Methodical", "Polite", "Practical", "Resilient", "Scholarly", "Self-Sufficient", "Solid", "Studious", "Suave", "Unwavering", "Witty"] },
+        { label: "Vices", values: ["Absent-Minded", "Aloof", "Critical", "Cynical", "Greedy", "Impulsive", "Inflexible", "Naive", "Obstinate", "Passive", "Pedantic", "Perfectionist", "Sarcastic", "Selfish", "Skeptical", "Stubborn", "Superficial", "Unfocused", "Unimaginative", "Vain"] },
     ],
 };
 
-export const agendas: PairedTable = {
-    columns: ["Goal", "Obstacle"],
-    rows: [
-        ["Ascension", "Conflict"],
-        ["Creation", "Corruption"],
-        ["Destruction", "Cost"],
-        ["Dominion", "Danger"],
-        ["Enlightenment", "Decay"],
-        ["Exploration", "Discord"],
-        ["Growth", "Division"],
-        ["Innovation", "Dogma"],
-        ["Justice", "Exposure"],
-        ["Knowledge", "Factionalism"],
-        ["Liberation", "Fear"],
-        ["Peace", "Ignorance"],
-        ["Power", "Incompetence"],
-        ["Preservation", "Injustice"],
-        ["Protection", "Isolation"],
-        ["Redemption", "Opposition"],
-        ["Revenge", "Sacrifice"],
-        ["Survival", "Stagnation"],
-        ["Transformation", "Tradition"],
-        ["Wealth", "Weakness"],
+export const agendas: Table = {
+    columns: [
+        { label: "Goal", values: ["Ascension", "Creation", "Destruction", "Dominion", "Enlightenment", "Exploration", "Growth", "Innovation", "Justice", "Knowledge", "Liberation", "Peace", "Power", "Preservation", "Protection", "Redemption", "Revenge", "Survival", "Transformation", "Wealth"] },
+        { label: "Obstacle", values: ["Conflict", "Corruption", "Cost", "Danger", "Decay", "Discord", "Division", "Dogma", "Exposure", "Factionalism", "Fear", "Ignorance", "Incompetence", "Injustice", "Isolation", "Opposition", "Sacrifice", "Stagnation", "Tradition", "Weakness"] },
     ],
 };
 
-export const monster: PairedTable = {
-    columns: ["Group", "Activity"],
-    rows: [
-        ["Avian", "Building"],
-        ["Beast", "Devouring"],
-        ["Behemoth", "Dying"],
-        ["Construct", "Fighting"],
-        ["Demon", "Growing"],
-        ["Extraplanar", "Haunting"],
-        ["Fey", "Hiding"],
-        ["Giant", "Killing"],
-        ["Goblinoid", "Mating"],
-        ["Humanoid", "Mourning"],
-        ["Hybrid", "Patrolling"],
-        ["Incorporeal", "Praying"],
-        ["Insectoid", "Protecting"],
-        ["Lizard", "Recuperating"],
-        ["Magical", "Scheming"],
-        ["Mythical", "Sleeping"],
-        ["Plant", "Stalking"],
-        ["Shape Shifter", "Torturing"],
-        ["Undead", "Training"],
-        ["Unusual", "Trapped"],
+export const monster: Table = {
+    columns: [
+        { label: "Group", values: { ref: "bestiary.families" } },
+        { label: "Activity", values: ["Building", "Devouring", "Dying", "Fighting", "Growing", "Haunting", "Hiding", "Killing", "Mating", "Mourning", "Patrolling", "Praying", "Protecting", "Recuperating", "Scheming", "Sleeping", "Stalking", "Torturing", "Training", "Trapped"] },
     ],
 };
 
-export const lore: PairedTable = {
-    columns: ["Room Type", "Clue"],
-    rows: [
-        ["Armory", "Decay"],
-        ["Barracks", "Decor"],
-        ["Bath", "Draft"],
-        ["Cistern", "Echoes"],
-        ["Court", "Footprints"],
-        ["Crypt", "Leavings"],
-        ["Den", "Light"],
-        ["Dining Hall", "Markings"],
-        ["Guard Post", "Moisture"],
-        ["Infirmary", "Noise"],
-        ["Kitchen", "Paraphernalia"],
-        ["Latrine", "Residue"],
-        ["Library", "Scurrying"],
-        ["Shrine", "Signs"],
-        ["Smith", "Smell"],
-        ["Stable", "Stains"],
-        ["Storage", "Tapping"],
-        ["Study", "Temperature"],
-        ["Vault", "Vibrations"],
-        ["Workshop", "Writing"],
+export const lore: Table = {
+    columns: [
+        { label: "Room Type", values: ["Armory", "Barracks", "Bath", "Cistern", "Court", "Crypt", "Den", "Dining Hall", "Guard Post", "Infirmary", "Kitchen", "Latrine", "Library", "Shrine", "Smith", "Stable", "Storage", "Study", "Vault", "Workshop"] },
+        { label: "Clue", values: ["Decay", "Decor", "Draft", "Echoes", "Footprints", "Leavings", "Light", "Markings", "Moisture", "Noise", "Paraphernalia", "Residue", "Scurrying", "Signs", "Smell", "Stains", "Tapping", "Temperature", "Vibrations", "Writing"] },
     ],
 };
 
-export const special: PairedTable = {
-    columns: ["Special", "Feature"],
-    rows: [
-        ["Books", "Ages"],
-        ["Bridge", "Alarms"],
-        ["Contraption", "Animates"],
-        ["Creature", "Attracts"],
-        ["Door", "Charges"],
-        ["Flames", "Closes"],
-        ["Furniture", "Falls"],
-        ["Hole", "Glows"],
-        ["Liquid", "Grows"],
-        ["Mirror", "Illusion"],
-        ["Mural", "Levitates"],
-        ["Pool", "Locks"],
-        ["Shadows", "Opens"],
-        ["Smoke", "Reflects"],
-        ["Statue", "Repels"],
-        ["Surface", "Reveals"],
-        ["Treasure", "Shifts"],
-        ["Voices", "Silences"],
-        ["Wheel", "Teleport"],
-        ["Writing", "Transforms"],
+export const special: Table = {
+    columns: [
+        { label: "Special", values: ["Books", "Bridge", "Contraption", "Creature", "Door", "Flames", "Furniture", "Hole", "Liquid", "Mirror", "Mural", "Pool", "Shadows", "Smoke", "Statue", "Surface", "Treasure", "Voices", "Wheel", "Writing"] },
+        { label: "Feature", values: ["Ages", "Alarms", "Animates", "Attracts", "Charges", "Closes", "Falls", "Glows", "Grows", "Illusion", "Levitates", "Locks", "Opens", "Reflects", "Repels", "Reveals", "Shifts", "Silences", "Teleport", "Transforms"] },
     ],
 };
 
-export const trap: PairedTable = {
-    columns: ["Trap", "Trigger"],
-    rows: [
-        ["Ages", "Activating"],
-        ["Burns", "Breaking"],
-        ["Captures", "Crossing"],
-        ["Carries", "Disturbing"],
-        ["Confuses", "Entering"],
-        ["Crushes", "Extinguishing"],
-        ["Curses", "Focusing"],
-        ["Cuts", "Interacting"],
-        ["Deafens", "Lighting"],
-        ["Drops", "Moving"],
-        ["Drowns", "Opening"],
-        ["Freezes", "Pulling"],
-        ["Glues", "Pushing"],
-        ["Hypnotizes", "Reading"],
-        ["Impales", "Speaking"],
-        ["Infects", "Stepping"],
-        ["Lifts", "Taking"],
-        ["Poisons", "Talking"],
-        ["Shocks", "Touching"],
-        ["Shoots", "Tripping"],
+export const trap: Table = {
+    columns: [
+        { label: "Trap", values: ["Ages", "Burns", "Captures", "Carries", "Confuses", "Crushes", "Curses", "Cuts", "Deafens", "Drops", "Drowns", "Freezes", "Glues", "Hypnotizes", "Impales", "Infects", "Lifts", "Poisons", "Shocks", "Shoots"] },
+        { label: "Trigger", values: ["Activating", "Breaking", "Crossing", "Disturbing", "Entering", "Extinguishing", "Focusing", "Interacting", "Lighting", "Moving", "Opening", "Pulling", "Pushing", "Reading", "Speaking", "Stepping", "Taking", "Talking", "Touching", "Tripping"] },
     ],
 };
 
-// Weight = faces on the die; total weight is the die size
+// Default room-type pool. Weight = faces on the die; total weight is the die size.
 export const defaultRoomTypes: RoomType[] = [
     { name: "Monster", weight: 1, table: monster },
     { name: "Lore", weight: 2, table: lore },

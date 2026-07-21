@@ -1,5 +1,5 @@
 import type { Config, Tables } from "../core/config.ts";
-import type { PairedTable } from "../types/rollTypes.ts";
+import type { Table } from "../types/rollTypes.ts";
 import { RoomTypeEditor } from "./RoomTypeEditor.tsx";
 import { TableEditor } from "./TableEditor.tsx";
 import styles from "./ConfigPage.module.css";
@@ -18,7 +18,7 @@ const FIXED_TABLES: { key: keyof Tables; title: string }[] = [
 ];
 
 export function ConfigPage({ config, onChange }: ConfigPageProps) {
-    const setTable = (key: keyof Tables, table: PairedTable) => {
+    const setTable = (key: keyof Tables, table: Table) => {
         onChange({ ...config, tables: { ...config.tables, [key]: table } });
     };
 
@@ -43,7 +43,7 @@ export function ConfigPage({ config, onChange }: ConfigPageProps) {
                                     <span className={styles.summaryRow}>
                                         <span className={styles.summaryTitle}>{title}</span>
                                         <span className={styles.summaryMeta}>
-                                            {table.columns[0]} × {table.columns[1]} · {table.rows.length} rows
+                                            {table.columns.map((c: { label: any; }) => c.label).join(" × ")} · {table.columns.length} cols
                                         </span>
                                     </span>
                                 </summary>

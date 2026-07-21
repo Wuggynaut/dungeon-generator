@@ -25,7 +25,7 @@ export function Section({ title, prompt, items, note, onNote, controls }: Sectio
             <h2>{title}</h2>
             <p><i>{prompt}</i></p>
             {items.map(item => (
-                <div key={item.roll.left.id}>
+                <div key={item.roll.cells[0].id}>
                     <h3 className={styles.itemTitle}>{item.label}</h3>
                     {item.meta && <div style={{ fontSize: "0.85em", opacity: 0.7 }}>{item.meta}</div>}
                     <RollView roll={item.roll} controls={controls} layout="compact" extra={item.extra} extras={item.extras} />

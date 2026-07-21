@@ -245,7 +245,9 @@ export default function App() {
                             items={dungeon.factions.map((faction, index) => ({
                                 label: `Faction ${index + 1}`,
                                 roll: faction.agenda,
-                                extra: { label: "Group", slot: faction.group },
+                                extra: faction.group.value !== faction.species.value
+                                    ? { label: "Family", slot: faction.group }
+                                    : undefined,
                                 extras: [{ label: "Species", slot: faction.species }],
                                 meta: `Strength ${faction.strength}${index === dominantFactionIndex(dungeon.factions) ? ", dominant" : ""}`,
                             }))}

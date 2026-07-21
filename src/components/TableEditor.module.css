@@ -82,3 +82,17 @@
 }
 .addRow:hover { color: var(--color-purple); border-color: var(--color-purple); }
 .addIcon { width: 14px; height: 14px; }
+/* column-oriented layout (N-column tables) */
+.columns {
+    display: flex;
+    gap: var(--space-4, 16px);
+    align-items: flex-start;
+    overflow-x: auto;
+}
+.column { flex: 0 0 auto; min-width: 12rem; }
+.columnHead { display: flex; gap: var(--space-1); align-items: center; }
+.valueRow { display: flex; gap: var(--space-1); align-items: center; }
+.linked { color: var(--color-muted); font-size: 14px; padding: 6px; }
+.linkNote { font-style: italic; margin-bottom: var(--space-2); }
+.linkedList { list-style: none; padding: 0; margin: 0; }
+.linkedList li { padding: 6px; }

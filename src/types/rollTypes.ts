@@ -1,15 +1,16 @@
 import type {DungeonMap} from "./mapTypes.ts";
 
-export type PairedTable = {
-    columns: [string, string];
-    rows: [string, string][];
-};
+export type ColumnValues = string[] | { ref: string }; // inline list, or a named source resolved at roll time
+
+export type Column = { label: string; values: ColumnValues };
+
+export type Table = { columns: Column[] };
 
 export type RoomType = {
     name: string;
     weight: number;
-    table: PairedTable;
-}
+    table: Table;
+};
 
 export type Species = { name: string; tags: string[] };
 
@@ -30,9 +31,8 @@ export type SlotControls = {
 };
 
 export type Roll = {
-    columns: [string, string]; //labels copies from the source table
-    left: Slot;
-    right: Slot;
+    columns: string[]; // column labels, copied from the source table
+    cells: Slot[];     // one rolled value per column
 };
 
 export type History = {

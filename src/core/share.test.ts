@@ -8,7 +8,7 @@ describe("share with config", () => {
         const custom: RoomType = {
             name: "Vault",
             weight: 3,
-            table: { columns: ["A", "B"], rows: [["x", "y"]] },
+            table: { columns: [{ label: "A", values: ["x"] }, { label: "B", values: ["y"] }] },
         };
         const state = {
             seed: "abc",

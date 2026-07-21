@@ -5,7 +5,7 @@ import {dominantFactionIndex} from "./generate.ts";
 type Notes = Record<string, string>;
 
 function rollLine(label: string, r: Roll): string {
-    return `- **${label}** — ${r.columns[0]}: ${r.left.value}; ${r.columns[1]}: ${r.right.value}`;
+    return `- **${label}** — ${r.columns[0]}: ${r.cells[0].value}; ${r.columns[1]}: ${r.cells[1].value}`;
 }
 
 function noteBlock(notes: Notes, key: string): string {
@@ -48,10 +48,15 @@ function roomsSection(dungeon: Dungeon): string {
             .map(n => `${n.number} (${n.type})`)
             .join(", ");
 
+        const isMonster = room.type === "Monster" && room.monster !== undefined;
+        const identity = isMonster
+            ? [
+                `- Species: ${room.monster!.value}`,
+                `- ${room.roll.columns[1]}: ${room.roll.cells[1].value}`,
+            ]
+            : room.roll.columns.map((label, i) => `- ${label}: ${room.roll.cells[i].value}`);
         const body = [
-            `- ${room.roll.columns[0]}: ${room.roll.left.value}`,
-            `- ${room.roll.columns[1]}: ${room.roll.right.value}`,
-            ...(room.monster ? [`- Monster: ${room.monster.value}`] : []),
+            ...identity,
             ...(room.details ?? []).map(d => `- Detail: ${d.value}`),
             ...(room.occupantFaction !== undefined ? [`- Held by: Faction ${room.occupantFaction + 1}`] : []),
             `- Connections: ${links || "none"}`,
@@ -90,9 +95,10 @@ export function serializeMarkdown(dungeon: Dungeon, notes: Notes = {}): string {
     blocks.push(section(
         "Factions",
         "What is each faction trying to achieve, and what stands in their way?",
-        dungeon.factions.map((f, i) =>
-            `${rollLine(`Faction ${i + 1}`, f.agenda)} (${f.group.value}: ${f.species.value}, strength ${f.strength}${i === dominant ? ", dominant" : ""})`
-        ),
+        dungeon.factions.map((f, i) => {
+            const face = f.group.value !== f.species.value ? `${f.species.value}, ${f.group.value}` : f.species.value;
+            return `${rollLine(`Faction ${i + 1}`, f.agenda)} (${face}; strength ${f.strength}${i === dominant ? ", dominant" : ""})`;
+        }),
         noteBlock(notes, "notes.factions"),
     ));
 

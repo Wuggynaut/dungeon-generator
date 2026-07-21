@@ -13,7 +13,7 @@ describe("serializeMarkdown", () => {
         expect(md).toContain("## Factions");
         expect(md).toContain("## Rooms");
         for (const room of dungeon.rooms) {
-            expect(md).toContain(room.roll.left.value);
+            expect(md).toContain(room.roll.cells[0].value);
         }
     });
 

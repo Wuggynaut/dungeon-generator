@@ -1,4 +1,4 @@
-import type { Overrides, PairedTable, RoomType } from "../types/rollTypes.ts";
+import type { Overrides, Table, RoomType } from "../types/rollTypes.ts";
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from "lz-string";
 import { type Config, defaultConfig, type Tables } from "./config.ts";
 
@@ -9,22 +9,28 @@ export type ShareState = {
     notes: Record<string, string>;
 };
 
-function isPairedTable(value: unknown): value is PairedTable {
+function isColumnValues(v: unknown): boolean {
+    if (Array.isArray(v)) return v.every(x => typeof x === "string");
+    return typeof v === "object" && v !== null && typeof (v as Record<string, unknown>).ref === "string";
+}
+
+function isTable(value: unknown): value is Table {
     if (typeof value !== "object" || value === null) return false;
     const t = value as Record<string, unknown>;
     return (
         Array.isArray(t.columns) &&
-        t.columns.length === 2 &&
-        t.columns.every(c => typeof c === "string") &&
-        Array.isArray(t.rows) &&
-        t.rows.every(r => Array.isArray(r) && r.length === 2 && r.every(c => typeof c === "string"))
+        t.columns.length >= 1 &&
+        t.columns.every(c =>
+            typeof c === "object" && c !== null &&
+            typeof (c as Record<string, unknown>).label === "string" &&
+            isColumnValues((c as Record<string, unknown>).values))
     );
 }
 
 function normalizeTables(value: unknown): Tables {
     const v = (typeof value === "object" && value !== null ? value : {}) as Record<string, unknown>;
-    const pick = (key: keyof Tables): PairedTable =>
-        isPairedTable(v[key]) ? (v[key] as PairedTable) : defaultConfig.tables[key];
+    const pick = (key: keyof Tables): Table =>
+        isTable(v[key]) ? (v[key] as Table) : defaultConfig.tables[key];
     return {
         purpose: pick("purpose"),
         construction: pick("construction"),

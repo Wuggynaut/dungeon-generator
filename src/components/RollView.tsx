@@ -60,18 +60,21 @@ export default function RollView({
                                      layout = "spread",
                                      extra,
                                      extras,
+                                     hiddenColumns,
                                  }: {
     roll: Roll;
     controls: SlotControls;
     layout?: "spread" | "compact";
     extra?: { label: string; slot: Slot };
     extras?: { label: string; slot: Slot }[];
-
+    hiddenColumns?: number[]; // column indices to omit (e.g. the family on a monster room)
 }) {
     return (
         <div className={layout === "compact" ? styles.compact : undefined}>
-            <Cell label={roll.columns[0]} slotId={roll.left.id} value={roll.left.value} controls={controls} />
-            <Cell label={roll.columns[1]} slotId={roll.right.id} value={roll.right.value} controls={controls} />
+            {roll.columns.map((label, i) =>
+                hiddenColumns?.includes(i) ? null : (
+                    <Cell key={roll.cells[i].id} label={label} slotId={roll.cells[i].id} value={roll.cells[i].value} controls={controls} />
+                ))}
             {extra && (
                 <Cell label={extra.label} slotId={extra.slot.id} value={extra.slot.value} controls={controls} />
             )}

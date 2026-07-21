@@ -20,9 +20,9 @@ describe("generate", () => {
     it("stores the seed and gives every value a path-shaped slot id", () => {
         const d = generate("test-seed");
         expect(d.seed).toBe("test-seed");
-        expect(d.history.purpose.left.id).toBe("history.purpose.left");
-        expect(d.denizens.standoutNPC.right.id).toBe("denizens.standoutNPC.right");
-        expect(d.factions[0].agenda.left.id).toBe("faction.0.agenda.left");
+        expect(d.history.purpose.cells[0].id).toBe("history.purpose.col.0");
+        expect(d.denizens.standoutNPC.cells[1].id).toBe("denizens.standoutNPC.col.1");
+        expect(d.factions[0].agenda.cells[0].id).toBe("faction.0.agenda.col.0");
     });
 
     it("gives each faction a species drawn from its family roster", () => {
@@ -42,8 +42,30 @@ describe("generate", () => {
 
     it("dominantFactionIndex returns the strongest faction, or null when empty", () => {
         expect(dominantFactionIndex([])).toBeNull();
-        const factions = [{ strength: 1 }, { strength: 3 }, { strength: 2 }] as never;
+        const factions = [{ strength: 1 }, { strength: 3 }, { strength: 2 }] as any;
         expect(dominantFactionIndex(factions)).toBe(1);
+    });
+
+    it("rerolls a monster room's family and allegiance independently", () => {
+        const base = generate("test-seed");
+        const monsterRoom = base.rooms.find(r => r.type === "Monster");
+        expect(monsterRoom).toBeDefined();
+        const id = monsterRoom!.id;
+
+        // Rerolling the family slot must not change the room's allegiance.
+        const familyRerolled = generate("test-seed", defaultConfig, {
+            [`room.${id}.col.0`]: { rerollCount: 3 },
+        });
+        const afterFamily = familyRerolled.rooms.find(r => r.id === id)!;
+        expect(afterFamily.occupantFaction).toBe(monsterRoom!.occupantFaction);
+
+        // Allegiance has its own slot; rerolling it yields a valid faction or unaligned.
+        const allegianceRerolled = generate("test-seed", defaultConfig, {
+            [`room.${id}.occupant`]: { rerollCount: 1 },
+        });
+        const afterAllegiance = allegianceRerolled.rooms.find(r => r.id === id)!;
+        const occ = afterAllegiance.occupantFaction;
+        expect(occ === undefined || (occ >= 0 && occ < base.factions.length)).toBe(true);
     });
 
     it("gives every room exactly one detail with a stable slot id", () => {
