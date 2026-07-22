@@ -5,39 +5,39 @@ import type { Subtables } from "../../types/rollTypes.ts";
 export const subtables: Subtables = {
     "mirror-details": {
         columns: [
-            { label: "Frame", values: ["iron", "wood", "gilded wood", "silver", "stone", "black glass"] },
-            { label: "Surface", values: ["clouded", "spotless", "fogged", "webbed with cracks", "showing the wrong room", "shows a warped image", "shows apparitions"] },
+            { label: "Frame", values: ["Iron", "Wood", "Gilded wood", "Silver", "Stone", "Black glass"] },
+            { label: "Surface", values: ["Clouded", "Spotless", "Fogged", "Cracked", "Shows the wrong room", "Shows a warped image", "Shows apparitions"] },
         ],
     },
     "pool-details": {
         columns: [
-            { label: "Liquid", values: ["clear water", "murky water", "saltwater", "black water", "pus", "blood", "oil"] },
-            { label: "Depth", values: ["ankle-deep", "waist-deep", "deep"] },
+            { label: "Liquid", values: ["Clear water", "Murky water", "Saltwater", "Black water", "Pus", "Blood", "Oil"] },
+            { label: "Depth", values: ["Ankle-deep", "Waist-deep", "Deep"] },
         ],
     },
     "statue-details": {
         columns: [
-            { label: "Subject", values: ["a robed figure", "a snarling beast", "a king", "a many-armed person", "a weeping woman",
-                    "a beautiful man", "a beautiful woman", "a saint", "a holy figure", "a war general", "abstract form", "a warrior"] },
-            { label: "Condition", values: ["weathered smooth", "defaced", "pristine", "toppled", "cracked", "in pieces"] },
+            { label: "Subject", values: ["A robed figure", "a snarling beast", "A king", "A many-armed figure", "A weeping woman",
+                    "A beautiful man", "A beautiful woman", "A saint", "A war general", "Abstract form", "A warrior"] },
+            { label: "Condition", values: ["Weathered smooth", "Defaced", "Pristine", "Toppled", "Cracked", "In pieces", "Moldy"] },
         ],
     },
     "door-details": {
         columns: [
-            { label: "Material", values: ["iron-banded oak", "solid bronze", "bone", "a stone slab", "rotted planks", "solid iron", "painted wood"] },
-            { label: "Detail", values: ["barred", "ajar", "sealed with wax", "off its hinges", "extraordinarily large", "holes", "burn marks", "decorated"] },
+            { label: "Material", values: ["Iron-banded oak", "Solid bronze", "Bone", "A stone slab", "Wooden planks", "Rotted wooden planks", "Solid iron", "Painted wood"] },
+            { label: "Detail", values: ["Barred", "Ajar", "Stuck", "Sealed with wax", "Off its hinges", "Extraordinarily large", "Holes", "Burn marks", "Decorated"] },
         ],
     },
     "writing-details": {
         columns: [
-            { label: "Script", values: ["an unknown tongue", "common tongue", "angular runes", "tally marks", "a child's hand", "thieves' cant"] },
-            { label: "Medium", values: ["carved", "painted in soot", "frantic scratchings", "dried blood", "burned"] },
+            { label: "Script", values: ["An unknown tongue", "Common tongue", "Angular runes", "Tally marks", "A child's hand", "Thieves' cant"] },
+            { label: "Medium", values: ["Carved", "Painted in soot", "Frantic scratchings", "Dried blood", "Burned", "Ink"] },
         ],
     },
     "treasure-details": {
         columns: [
-            { label: "Form", values: ["loose coins", "a jeweled reliquary", "stacked ingots", "a hoard of oddments", "a decorated vase", "religious relic"] },
-            { label: "State", values: ["dusty and forgotten", "inside a warding circle", "trapped", "fused to the floor", "hidden under detritus"] },
+            { label: "Form", values: ["Loose coins", "A jeweled reliquary", "Stacked ingots", "A hoard of oddments", "A decorated vase", "Religious relic"] },
+            { label: "State", values: ["Dusty and forgotten", "Inside a warding circle", "Trapped", "Fused to the floor", "Hidden under detritus"] },
         ],
     },
 };

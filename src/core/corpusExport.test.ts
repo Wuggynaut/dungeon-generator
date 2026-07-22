@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { serializePurposeVocab, serializeConstructionVocab, serializeDressing, serializeBestiary } from "./corpusExport.ts";
+import { serializePurposeVocab, serializeConstructionVocab, serializeDressing, serializeBestiary, serializeSubtables } from "./corpusExport.ts";
 import { purposeVocab } from "./data/purposeTags.ts";
 import { constructionVocab } from "./data/constructionKind.ts";
 import { dressing } from "./data/dressing.ts";
 import { bestiary } from "./data/monsters.ts";
+import { subtables } from "./data/subtables.ts";
 
 describe("corpus export", () => {
     it("purpose: emits every entry with its value and tags", () => {
@@ -19,6 +20,14 @@ describe("corpus export", () => {
         const out = serializeConstructionVocab(constructionVocab);
         expect((out.match(/\{ value: "/g) ?? []).length).toBe(constructionVocab.length);
         for (const v of constructionVocab) expect(out).toContain(`kind: ${JSON.stringify(v.kind)}`);
+    });
+
+    it("subtables: emits every child table by id with its columns", () => {
+        const out = serializeSubtables(subtables);
+        for (const [id, table] of Object.entries(subtables)) {
+            expect(out).toContain(`${JSON.stringify(id)}: { columns:`);
+            for (const c of table.columns) expect(out).toContain(`label: ${JSON.stringify(c.label)}`);
+        }
     });
 
     it("bestiary: emits every family with its species", () => {

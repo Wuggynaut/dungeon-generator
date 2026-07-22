@@ -11,6 +11,7 @@ import { constructionVocab, type ConstructionKind } from "../core/data/construct
 import { dressing } from "../core/data/dressing.ts";
 import { serializePurposeVocab, serializeConstructionVocab, serializeDressing } from "../core/corpusExport.ts";
 import { BestiaryEditor } from "./BestiaryEditor.tsx";
+import { SubtableEditor } from "./SubtableEditor.tsx";
 
 type ConfigPageProps = {
     config: Config;
@@ -115,6 +116,15 @@ export function ConfigPage({ config, onChange }: ConfigPageProps) {
                             serialize={serializeConstructionVocab}
                             filename="constructionKind.ts"
                         />
+                    </div>
+                </details>
+
+                <details className={styles.details}>
+                    <summary className={styles.summary}>
+                        <span className={styles.summaryTitle}>Subtables</span>
+                    </summary>
+                    <div className={styles.detailsBody}>
+                        <SubtableEditor />
                     </div>
                 </details>
 

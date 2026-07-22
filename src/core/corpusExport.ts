@@ -1,8 +1,9 @@
-import type { Detail, Family } from "../types/rollTypes.ts";
+import type { Detail, Family, Subtables, Table, ColumnValues } from "../types/rollTypes.ts";
 import type { ConstructionKind } from "./data/constructionKind.ts";
 
 // Serializers that turn an edited corpus back into its source .ts file. The
 // Setup editors call these; copy or download the result and commit it.
+
 const S = (x: string) => JSON.stringify(x);
 const list = (xs: string[]) => `[${xs.map(S).join(", ")}]`;
 
@@ -75,5 +76,29 @@ export const familyByName: Record<string, Family> =
 
 export const monstersByGroup: Record<string, string[]> =
     Object.fromEntries(bestiary.map(f => [f.name, f.species.map(s => s.name)]));
+`;
+}
+
+function serializeColumnValues(values: ColumnValues): string {
+    if (!Array.isArray(values)) return `{ ref: ${S(values.ref)} }`;
+    const items = values.map(v =>
+        typeof v === "string"
+            ? S(v)
+            : `{ value: ${S(v.value)}${v.subtable ? `, subtable: ${S(v.subtable)}` : ""} }`);
+    return `[${items.join(", ")}]`;
+}
+
+function serializeTable(t: Table): string {
+    const cols = t.columns.map(c => `{ label: ${S(c.label)}, values: ${serializeColumnValues(c.values)} }`);
+    return `{ columns: [${cols.join(", ")}] }`;
+}
+
+export function serializeSubtables(subs: Subtables): string {
+    const entries = Object.entries(subs).map(([id, t]) => `    ${S(id)}: ${serializeTable(t)},`).join("\n");
+    return `import type { Subtables } from "../../types/rollTypes.ts";
+
+export const subtables: Subtables = {
+${entries}
+};
 `;
 }

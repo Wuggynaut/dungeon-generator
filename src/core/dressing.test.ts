@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { dressing } from "./dressing.ts";
+import { dressing } from "./data/dressing.ts";
 
 // The eligible-pool floor. For now nothing filters the list, so the whole
 // table is the eligible pool. When we add `requires` tags, this same floor applies per realistic context.

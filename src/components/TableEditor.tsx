@@ -32,6 +32,12 @@ export function TableEditor({ table, onChange }: TableEditorProps) {
         mapLiteral(ci, values => values.map((v, j) =>
             (j === vi ? (typeof v === "string" ? value : { ...v, value }) : v)));
     const addValue = (ci: number) => mapLiteral(ci, values => [...values, ""]);
+    const setSubtable = (ci: number, vi: number, id: string) =>
+        mapLiteral(ci, values => values.map((v, j) => {
+            if (j !== vi) return v;
+            const value = typeof v === "string" ? v : v.value;
+            return id ? { value, subtable: id } : value; // empty id -> back to a plain string
+        }));
     const removeValue = (ci: number, vi: number) =>
         mapLiteral(ci, values => values.filter((_, j) => j !== vi));
 
@@ -74,6 +80,13 @@ export function TableEditor({ table, onChange }: TableEditorProps) {
                                                 className={styles.cellInput}
                                                 value={valueText(v)}
                                                 onChange={e => setValue(ci, vi, e.target.value)}
+                                            />
+                                            <input
+                                                className={styles.cellInput}
+                                                style={{ maxWidth: "8rem", opacity: 0.8 }}
+                                                placeholder="subtable id"
+                                                value={typeof v === "string" ? "" : (v.subtable ?? "")}
+                                                onChange={e => setSubtable(ci, vi, e.target.value)}
                                             />
                                             <IconButton label="Remove value" disabled={values.length === 1} onClick={() => removeValue(ci, vi)}>
                                                 <TrashIcon />
