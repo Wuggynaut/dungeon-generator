@@ -65,8 +65,26 @@ for (const rows of blocks) {
 // emit
 const quote = (value: string) => JSON.stringify(value);
 
-const literalColumn = (label: string, values: string[]) =>
-    `    { label: ${quote(label)}, values: [${values.map(quote).join(", ")}] },`;
+const literalColumn = (label: string, values: string[], routes?: Record<string, string>) => {
+    const items = values.map((v) =>
+        routes && routes[v] ? `{ value: ${quote(v)}, subtable: ${quote(routes[v])} }` : quote(v));
+    return `    { label: ${quote(label)}, values: [${items.join(", ")}] },`;
+};
+
+// table -> column label -> rolled value -> subtable id. Baked onto the value so
+// it carries its own route (see the subtables registry in src/core/data).
+const SUBTABLE_ROUTES: Record<string, Record<string, Record<string, string>>> = {
+    special: {
+        Special: {
+            Mirror: "mirror-specifics",
+            Pool: "pool-specifics",
+            Statue: "statue-specifics",
+            Door: "door-specifics",
+            Writing: "writing-specifics",
+            Treasure: "treasure-specifics",
+        },
+    },
+};
 
 const refColumn = (label: string, ref: string) =>
     `    { label: ${quote(label)}, values: { ref: ${quote(ref)} } },`;
@@ -82,9 +100,9 @@ const constOf = (name: string, table: RawTable) => {
     const refs = REF_COLUMNS[name] ?? {};
     const col = (ci: number) => {
         const label = table.columns[ci];
-        return refs[label]
-            ? refColumn(label, refs[label])
-            : literalColumn(label, table.rows.map((r) => r[ci]));
+        if (refs[label]) return refColumn(label, refs[label]);
+        const routes = (SUBTABLE_ROUTES[name] ?? {})[label];
+        return literalColumn(label, table.rows.map((r) => r[ci]), routes);
     };
     // The monster table keeps only Activity; family is chosen in generate.ts.
     const columns = name === "monster" ? [col(1)] : [col(0), col(1)];

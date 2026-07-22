@@ -51,7 +51,7 @@ export const lore: Table = {
 
 export const special: Table = {
     columns: [
-        { label: "Special", values: ["Books", "Bridge", "Contraption", "Creature", "Door", "Flames", "Furniture", "Hole", "Liquid", "Mirror", "Mural", "Pool", "Shadows", "Smoke", "Statue", "Surface", "Treasure", "Voices", "Wheel", "Writing"] },
+        { label: "Special", values: ["Books", "Bridge", "Contraption", "Creature", { value: "Door", subtable: "door-details" }, "Flames", "Furniture", "Hole", "Liquid", { value: "Mirror", subtable: "mirror-details" }, "Mural", { value: "Pool", subtable: "pool-details" }, "Shadows", "Smoke", { value: "Statue", subtable: "statue-details" }, "Surface", { value: "Treasure", subtable: "treasure-details" }, "Voices", "Wheel", { value: "Writing", subtable: "writing-details" }] },
         { label: "Feature", values: ["Ages", "Alarms", "Animates", "Attracts", "Charges", "Closes", "Falls", "Glows", "Grows", "Illusion", "Levitates", "Locks", "Opens", "Reflects", "Repels", "Reveals", "Shifts", "Silences", "Teleport", "Transforms"] },
     ],
 };

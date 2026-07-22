@@ -1,6 +1,10 @@
 import type {DungeonMap} from "./mapTypes.ts";
 
-export type ColumnValues = string[] | { ref: string }; // inline list, or a named source resolved at roll time
+// A column value is a bare string, or an object that names a subtable to roll
+// when this value comes up.
+export type ColumnValue = string | { value: string; subtable?: string };
+
+export type ColumnValues = ColumnValue[] | { ref: string }; // inline list, or a named source
 
 export type Column = { label: string; values: ColumnValues };
 
@@ -14,9 +18,9 @@ export type RoomType = {
 
 export type Detail = {
     text: string;
-    requires?: string[];
-    affinity?: string[];
-    weight?: number;
+    requires?: string[]; // every tag must be in the room context, else ineligible (suppression)
+    affinity?: string[]; // each tag present in the context adds weight (steering)
+    weight?: number;     // base weight before affinity (default 1)
 };
 
 export type Species = { name: string; tags: string[] };
@@ -40,7 +44,11 @@ export type SlotControls = {
 export type Roll = {
     columns: string[]; // column labels, copied from the source table
     cells: Slot[];     // one rolled value per column
+    subrolls?: (Roll | null)[]; // per-cell child roll when the value routes to a subtable
 };
+
+// A flat registry of named child tables.
+export type Subtables = Record<string, Table>;
 
 export type History = {
     purpose: Roll;
@@ -64,7 +72,7 @@ export type Room = {
     type: string;
     roll: Roll;
     monster?: Slot; // the species shown for a monster room
-    family?: string; // which family the species was drawn from (not shown to user)
+    family?: string; // backend only: which family the species was drawn from (never shown)
     occupantFaction?: number; // index into dungeon.factions; absent = unaligned or non-monster room
     details?: Slot[]; // rolled dressing lines; slot ids are room.<id>.detail.<n>
 };

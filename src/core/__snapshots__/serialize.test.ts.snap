@@ -7,113 +7,110 @@ exports[`serializeMarkdown > matches the pinned snapshot 1`] = `
 
 *Why was this dungeon built, how was it built, and what caused its downfall?*
 
-- **Purpose** — Original Use: Hideout; Built By: A Secret Society
-- **Construction** — Entrance: An Enormous Grave; Composition: Obsidian
-- **Ruination** — Condition: Devoured; Cause: Cataclysmic Flood
+- **Purpose** — Original Use: Celestial Observations; Built By: Immoral Sorcerers
+- **Construction** — Entrance: Skyward Beam of Light; Composition: Coral
+- **Ruination** — Condition: Overpopulated; Cause: Obfuscation
 
 ## Denizens
 
 *What do we know about the creatures and factions that occupy the dungeon?*
 
-- **General attitude** — Virtues: Studious; Vices: Sarcastic
-- **Standout NPC** — Virtues: Incisive; Vices: Impulsive
+- **General attitude** — Virtues: Unwavering; Vices: Skeptical
+- **Standout NPC** — Virtues: Incorruptible; Vices: Greedy
 
 ## Factions
 
 *What is each faction trying to achieve, and what stands in their way?*
 
-- **Faction 1** — Goal: Redemption; Obstacle: Sacrifice (Construct: Cobblehounds, strength 1, dominant)
-- **Faction 2** — Goal: Wealth; Obstacle: Incompetence (Goblinoid: Ogre, strength 1)
+- **Faction 1** — Goal: Destruction; Obstacle: Incompetence (Type: Humanfolk; strength 1, dominant)
+- **Faction 2** — Goal: Preservation; Obstacle: Stagnation (Type: Viper; strength 1)
 
 ## Rooms
 
 ### 1. Lore (Entrance)
 
-- Room Type: Cistern
-- Clue: Leavings
-- Detail: Scorch marks, long gone cold
+- Room Type: Latrine
+- Clue: Vibrations
+- Detail: A discarded pack, empty
 - Connections: 2 (standard), 3 (standard), 4 (standard)
 
 ### 2. Special
 
-- Special: Bridge
-- Feature: Shifts
-- Detail: Water dripping steadily from above
+- Special: Hole
+- Feature: Teleport
+- Detail: Grey mold
 - Connections: 1 (standard), 3 (standard), 5 (standard)
 
 ### 3. Monster
 
-- Group: Construct
-- Activity: Mating
-- Monster: Bone Construct
-- Detail: A cracked, yellowed skull
+- Species: Acolyte
+- Activity: Devouring
+- Detail: Gnawed bones
 - Held by: Faction 1
 - Connections: 1 (standard), 2 (standard)
 
 ### 4. Lore
 
-- Room Type: Cistern
-- Clue: Draft
-- Detail: Water dripping steadily from above
+- Room Type: Kitchen
+- Clue: Scurrying
+- Detail: Grey mold
 - Connections: 1 (standard), 6 (standard)
 
 ### 5. Special
 
-- Special: Flames
-- Feature: Grows
-- Detail: A crumbling section of floor
+- Special: Smoke
+- Feature: Silences
+- Detail: A vein of ore
 - Connections: 2 (standard), 7 (standard)
 
 ### 6. Trap
 
-- Trap: Cuts
-- Trigger: Pulling
-- Detail: A length of rotted rope
+- Trap: Infects
+- Trigger: Activating
+- Detail: Shattered wooden crates
 - Connections: 4 (standard), 8 (conditional)
 
 ### 7. Trap
 
-- Trap: Confuses
+- Trap: Cuts
 - Trigger: Entering
-- Detail: Mud tracked in a long smear
+- Detail: A shallow puddle of water
 - Connections: 5 (standard), 9 (standard)
 
 ### 8. Lore
 
-- Room Type: Shrine
-- Clue: Noise
-- Detail: Pale mushrooms clustered low on a wall
+- Room Type: Stable
+- Clue: Decor
+- Detail: A cold draught
 - Connections: 6 (conditional), 9 (standard)
 
 ### 9. Monster
 
-- Group: Goblinoid
-- Activity: Killing
-- Monster: Ogre
-- Detail: A dead rat, half-rotted
+- Species: Viper
+- Activity: Protecting
+- Detail: Dead vermin
 - Held by: Faction 2
 - Connections: 7 (standard), 8 (standard), 10 (standard)
 
 ### 10. Lore
 
-- Room Type: Stable
-- Clue: Decay
-- Detail: A crude tally scratched into the stone
+- Room Type: Den
+- Clue: Decor
+- Detail: A colonies of pale mushrooms
 - Connections: 9 (standard), 11 (standard), 12 (standard)
 
 ### 11. Trap
 
-- Trap: Freezes
-- Trigger: Activating
-- Detail: A broken shard of glass
+- Trap: Curses
+- Trigger: Entering
+- Detail: Dried pools
 - Connections: 10 (standard)
 
 ### 12. Monster
 
-- Group: Construct
-- Activity: Fighting
-- Monster: Gargoyle
-- Detail: A scattering of small animal bones
+- Species: Hooded Men
+- Activity: Scheming
+- Detail: Human bones, picked clean
 - Held by: Faction 1
 - Connections: 10 (standard)
 "

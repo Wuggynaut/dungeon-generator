@@ -1,4 +1,4 @@
-import type { Table, Column, ColumnValues } from "../types/rollTypes.ts";
+import type { Table, Column, ColumnValue, ColumnValues } from "../types/rollTypes.ts";
 import { resolveColumn } from "../core/data/columnSources.ts";
 import { IconButton } from "./IconButton.tsx";
 import { TrashIcon } from "./icons/TrashIcon.tsx";
@@ -14,19 +14,23 @@ function isRef(v: ColumnValues): v is { ref: string } {
     return !Array.isArray(v);
 }
 
-// Column-oriented editor. A referenced column (its values come from a named source like the bestiary) shows read-only:
-// you change it by editing the source.
+const valueText = (v: ColumnValue): string => (typeof v === "string" ? v : v.value);
+
+// Column-oriented editor. Each column is an independent list, so columns can
+// differ in length. A referenced column (its values come from a named source
+// like the bestiary) shows read-only; you change it by editing the source.
 export function TableEditor({ table, onChange }: TableEditorProps) {
     const cols = table.columns;
     const update = (next: Column[]) => onChange({ ...table, columns: next });
 
-    const mapLiteral = (ci: number, fn: (values: string[]) => string[]) =>
+    const mapLiteral = (ci: number, fn: (values: ColumnValue[]) => ColumnValue[]) =>
         update(cols.map((c, i) => (i === ci && !isRef(c.values) ? { ...c, values: fn(c.values) } : c)));
 
     const setLabel = (ci: number, label: string) =>
         update(cols.map((c, i) => (i === ci ? { ...c, label } : c)));
     const setValue = (ci: number, vi: number, value: string) =>
-        mapLiteral(ci, values => values.map((v, j) => (j === vi ? value : v)));
+        mapLiteral(ci, values => values.map((v, j) =>
+            (j === vi ? (typeof v === "string" ? value : { ...v, value }) : v)));
     const addValue = (ci: number) => mapLiteral(ci, values => [...values, ""]);
     const removeValue = (ci: number, vi: number) =>
         mapLiteral(ci, values => values.filter((_, j) => j !== vi));
@@ -59,7 +63,7 @@ export function TableEditor({ table, onChange }: TableEditorProps) {
                                 <div className={styles.linked}>
                                     <div className={styles.linkNote}>Linked to {refName}. Edit the source, not here.</div>
                                     <ul className={styles.linkedList}>
-                                        {values.map((v, vi) => <li key={vi}>{v}</li>)}
+                                        {values.map((v, vi) => <li key={vi}>{valueText(v)}</li>)}
                                     </ul>
                                 </div>
                             ) : (
@@ -68,7 +72,7 @@ export function TableEditor({ table, onChange }: TableEditorProps) {
                                         <div key={vi} className={styles.valueRow}>
                                             <input
                                                 className={styles.cellInput}
-                                                value={v}
+                                                value={valueText(v)}
                                                 onChange={e => setValue(ci, vi, e.target.value)}
                                             />
                                             <IconButton label="Remove value" disabled={values.length === 1} onClick={() => removeValue(ci, vi)}>

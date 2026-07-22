@@ -54,7 +54,7 @@ function roomsSection(dungeon: Dungeon): string {
                 `- Species: ${room.monster!.value}`,
                 `- ${room.roll.columns[0]}: ${room.roll.cells[0].value}`,
             ]
-            : room.roll.columns.map((label, i) => `- ${label}: ${room.roll.cells[i].value}`);
+            : rollLines(room.roll, "");
         const body = [
             ...identity,
             ...(room.details ?? []).map(d => `- Detail: ${d.value}`),
@@ -65,6 +65,15 @@ function roomsSection(dungeon: Dungeon): string {
         blocks.push(`${title}\n\n${body}`);
     }
     return blocks.join("\n\n");
+}
+
+// Render a roll as markdown lines, nesting any subtable child under its value.
+function rollLines(roll: Roll, indent: string): string[] {
+    return roll.columns.flatMap((label, i) => {
+        const line = `${indent}- ${label}: ${roll.cells[i].value}`;
+        const sub = roll.subrolls?.[i];
+        return sub ? [line, ...rollLines(sub, indent + "  ")] : [line];
+    });
 }
 
 export function serializeMarkdown(dungeon: Dungeon, notes: Notes = {}): string {

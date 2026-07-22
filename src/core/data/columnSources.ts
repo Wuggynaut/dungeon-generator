@@ -1,4 +1,4 @@
-import type { ColumnValues } from "../../types/rollTypes.ts";
+import type {ColumnValue, ColumnValues} from "../../types/rollTypes.ts";
 import { groupNames } from "./monsters.ts";
 import { purposeValues } from "./purposeTags.ts";
 import { constructionValues } from "./constructionKind.ts";
@@ -16,8 +16,19 @@ export function refExists(ref: string): boolean {
 }
 
 // A column's values: the literal list, or the resolved contents of its ref.
+function valueText(v: ColumnValue): string {
+    return typeof v === "string" ? v : v.value;
+}
+
 export function resolveColumn(values: ColumnValues): string[] {
-    if (Array.isArray(values)) return values;
+    if (Array.isArray(values)) return values.map(valueText);
     const source = registry[values.ref];
     return source ? source() : [];
+}
+
+// The subtable a rolled value routes to, if any.
+export function subtableFor(values: ColumnValues, value: string): string | undefined {
+    if (!Array.isArray(values)) return undefined;
+    const found = values.find(v => valueText(v) === value);
+    return found && typeof found === "object" ? found.subtable : undefined;
 }

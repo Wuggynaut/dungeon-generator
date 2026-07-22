@@ -74,6 +74,11 @@ describe("generate", () => {
         expect(after).not.toBe(before);
     });
 
+    it("omits room details when resolveDetails is off", () => {
+        const d = generate("test-seed", { ...defaultConfig, resolveDetails: false });
+        for (const room of d.rooms) expect(room.details).toBeUndefined();
+    });
+
     it("gives every room exactly one detail with a stable slot id", () => {
         const d = generate("test-seed");
         for (const room of d.rooms) {

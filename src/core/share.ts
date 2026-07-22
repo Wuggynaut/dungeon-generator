@@ -10,7 +10,9 @@ export type ShareState = {
 };
 
 function isColumnValues(v: unknown): boolean {
-    if (Array.isArray(v)) return v.every(x => typeof x === "string");
+    if (Array.isArray(v)) return v.every(x =>
+        typeof x === "string" ||
+        (typeof x === "object" && x !== null && typeof (x as Record<string, unknown>).value === "string"));
     return typeof v === "object" && v !== null && typeof (v as Record<string, unknown>).ref === "string";
 }
 
@@ -47,6 +49,7 @@ function normalizeConfig(value: unknown): Config {
         factionCount: typeof c.factionCount === "number" ? c.factionCount : defaultConfig.factionCount,
         roomTypes: Array.isArray(c.roomTypes) ? (c.roomTypes as RoomType[]) : defaultConfig.roomTypes,
         tables: normalizeTables(c.tables),
+        resolveDetails: typeof c.resolveDetails === "boolean" ? c.resolveDetails : defaultConfig.resolveDetails,
     };
 }
 

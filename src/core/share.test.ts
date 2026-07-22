@@ -20,6 +20,12 @@ describe("share with config", () => {
         expect(back).toEqual(state);
     });
 
+    it("back-fills resolveDetails on a config saved before the field existed", () => {
+        const legacy = { seed: "abc", config: { roomCount: 5, factionCount: 1 }, overrides: {}, notes: {} };
+        const back = decodeState(encodeState(legacy as never));
+        expect(back?.config.resolveDetails).toBe(true);
+    });
+
     it("falls back to default config on a link without one", () => {
         const back = decodeState(encodeState({ seed: "abc", overrides: {}, notes: {} } as never));
         expect(back?.config).toEqual(defaultConfig);

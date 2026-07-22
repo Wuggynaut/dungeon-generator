@@ -4,128 +4,134 @@ exports[`generate > matches the pinned snapshot 1`] = `
 {
   "denizens": {
     "attitude": {
+      "cells": [
+        {
+          "id": "denizens.attitude.col.0",
+          "value": "Unwavering",
+        },
+        {
+          "id": "denizens.attitude.col.1",
+          "value": "Skeptical",
+        },
+      ],
       "columns": [
         "Virtues",
         "Vices",
       ],
-      "left": {
-        "id": "denizens.attitude.left",
-        "value": "Studious",
-      },
-      "right": {
-        "id": "denizens.attitude.right",
-        "value": "Sarcastic",
-      },
     },
     "standoutNPC": {
+      "cells": [
+        {
+          "id": "denizens.standoutNPC.col.0",
+          "value": "Incorruptible",
+        },
+        {
+          "id": "denizens.standoutNPC.col.1",
+          "value": "Greedy",
+        },
+      ],
       "columns": [
         "Virtues",
         "Vices",
       ],
-      "left": {
-        "id": "denizens.standoutNPC.left",
-        "value": "Incisive",
-      },
-      "right": {
-        "id": "denizens.standoutNPC.right",
-        "value": "Impulsive",
-      },
     },
   },
   "factions": [
     {
       "agenda": {
+        "cells": [
+          {
+            "id": "faction.0.agenda.col.0",
+            "value": "Destruction",
+          },
+          {
+            "id": "faction.0.agenda.col.1",
+            "value": "Incompetence",
+          },
+        ],
         "columns": [
           "Goal",
           "Obstacle",
         ],
-        "left": {
-          "id": "faction.0.agenda.left",
-          "value": "Redemption",
-        },
-        "right": {
-          "id": "faction.0.agenda.right",
-          "value": "Sacrifice",
-        },
       },
       "group": {
         "id": "faction.0.group",
-        "value": "Construct",
-      },
-      "species": {
-        "id": "faction.0.species",
-        "value": "Cobblehounds",
+        "value": "Humanfolk",
       },
       "strength": 1,
     },
     {
       "agenda": {
+        "cells": [
+          {
+            "id": "faction.1.agenda.col.0",
+            "value": "Preservation",
+          },
+          {
+            "id": "faction.1.agenda.col.1",
+            "value": "Stagnation",
+          },
+        ],
         "columns": [
           "Goal",
           "Obstacle",
         ],
-        "left": {
-          "id": "faction.1.agenda.left",
-          "value": "Wealth",
-        },
-        "right": {
-          "id": "faction.1.agenda.right",
-          "value": "Incompetence",
-        },
       },
       "group": {
         "id": "faction.1.group",
-        "value": "Goblinoid",
-      },
-      "species": {
-        "id": "faction.1.species",
-        "value": "Ogre",
+        "value": "Viper",
       },
       "strength": 1,
     },
   ],
   "history": {
     "construction": {
+      "cells": [
+        {
+          "id": "history.construction.col.0",
+          "value": "Skyward Beam of Light",
+        },
+        {
+          "id": "history.construction.col.1",
+          "value": "Coral",
+        },
+      ],
       "columns": [
         "Entrance",
         "Composition",
       ],
-      "left": {
-        "id": "history.construction.left",
-        "value": "An Enormous Grave",
-      },
-      "right": {
-        "id": "history.construction.right",
-        "value": "Obsidian",
-      },
     },
     "purpose": {
+      "cells": [
+        {
+          "id": "history.purpose.col.0",
+          "value": "Celestial Observations",
+        },
+        {
+          "id": "history.purpose.col.1",
+          "value": "Immoral Sorcerers",
+        },
+      ],
       "columns": [
         "Original Use",
         "Built By",
       ],
-      "left": {
-        "id": "history.purpose.left",
-        "value": "Hideout",
-      },
-      "right": {
-        "id": "history.purpose.right",
-        "value": "A Secret Society",
-      },
     },
     "ruination": {
+      "cells": [
+        {
+          "id": "history.ruination.col.0",
+          "value": "Overpopulated",
+        },
+        {
+          "id": "history.ruination.col.1",
+          "value": "Obfuscation",
+        },
+      ],
       "columns": [
         "Condition",
         "Cause",
       ],
-      "left": {
-        "id": "history.ruination.left",
-        "value": "Devoured",
-      },
-      "right": {
-        "id": "history.ruination.right",
-        "value": "Cataclysmic Flood",
-      },
     },
   },
   "map": {
@@ -277,23 +283,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.1.detail.0",
-          "value": "Scorch marks, long gone cold",
+          "value": "A discarded pack, empty",
         },
       ],
       "id": 1,
       "roll": {
+        "cells": [
+          {
+            "id": "room.1.col.0",
+            "value": "Latrine",
+          },
+          {
+            "id": "room.1.col.1",
+            "value": "Vibrations",
+          },
+        ],
         "columns": [
           "Room Type",
           "Clue",
         ],
-        "left": {
-          "id": "room.1.left",
-          "value": "Cistern",
-        },
-        "right": {
-          "id": "room.1.right",
-          "value": "Leavings",
-        },
       },
       "type": "Lore",
     },
@@ -301,23 +309,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.2.detail.0",
-          "value": "Pale mushrooms clustered low on a wall",
+          "value": "A cold draught",
         },
       ],
       "id": 2,
       "roll": {
+        "cells": [
+          {
+            "id": "room.2.col.0",
+            "value": "Stable",
+          },
+          {
+            "id": "room.2.col.1",
+            "value": "Decor",
+          },
+        ],
         "columns": [
           "Room Type",
           "Clue",
         ],
-        "left": {
-          "id": "room.2.left",
-          "value": "Shrine",
-        },
-        "right": {
-          "id": "room.2.right",
-          "value": "Noise",
-        },
       },
       "type": "Lore",
     },
@@ -325,23 +335,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.3.detail.0",
-          "value": "Water dripping steadily from above",
+          "value": "Grey mold",
         },
       ],
       "id": 3,
       "roll": {
+        "cells": [
+          {
+            "id": "room.3.col.0",
+            "value": "Hole",
+          },
+          {
+            "id": "room.3.col.1",
+            "value": "Teleport",
+          },
+        ],
         "columns": [
           "Special",
           "Feature",
         ],
-        "left": {
-          "id": "room.3.left",
-          "value": "Bridge",
-        },
-        "right": {
-          "id": "room.3.right",
-          "value": "Shifts",
-        },
       },
       "type": "Special",
     },
@@ -349,28 +361,26 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.4.detail.0",
-          "value": "A cracked, yellowed skull",
+          "value": "Gnawed bones",
         },
       ],
+      "family": "Humanfolk",
       "id": 4,
       "monster": {
         "id": "room.4.monster",
-        "value": "Bone Construct",
+        "value": "Acolyte",
       },
       "occupantFaction": 0,
       "roll": {
+        "cells": [
+          {
+            "id": "room.4.col.0",
+            "value": "Devouring",
+          },
+        ],
         "columns": [
-          "Group",
           "Activity",
         ],
-        "left": {
-          "id": "room.4.left",
-          "value": "Construct",
-        },
-        "right": {
-          "id": "room.4.right",
-          "value": "Mating",
-        },
       },
       "type": "Monster",
     },
@@ -378,23 +388,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.5.detail.0",
-          "value": "Water dripping steadily from above",
+          "value": "Grey mold",
         },
       ],
       "id": 5,
       "roll": {
+        "cells": [
+          {
+            "id": "room.5.col.0",
+            "value": "Kitchen",
+          },
+          {
+            "id": "room.5.col.1",
+            "value": "Scurrying",
+          },
+        ],
         "columns": [
           "Room Type",
           "Clue",
         ],
-        "left": {
-          "id": "room.5.left",
-          "value": "Cistern",
-        },
-        "right": {
-          "id": "room.5.right",
-          "value": "Draft",
-        },
       },
       "type": "Lore",
     },
@@ -402,23 +414,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.6.detail.0",
-          "value": "A crumbling section of floor",
+          "value": "A vein of ore",
         },
       ],
       "id": 6,
       "roll": {
+        "cells": [
+          {
+            "id": "room.6.col.0",
+            "value": "Smoke",
+          },
+          {
+            "id": "room.6.col.1",
+            "value": "Silences",
+          },
+        ],
         "columns": [
           "Special",
           "Feature",
         ],
-        "left": {
-          "id": "room.6.left",
-          "value": "Flames",
-        },
-        "right": {
-          "id": "room.6.right",
-          "value": "Grows",
-        },
       },
       "type": "Special",
     },
@@ -426,23 +440,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.7.detail.0",
-          "value": "A broken shard of glass",
+          "value": "Dried pools",
         },
       ],
       "id": 7,
       "roll": {
+        "cells": [
+          {
+            "id": "room.7.col.0",
+            "value": "Curses",
+          },
+          {
+            "id": "room.7.col.1",
+            "value": "Entering",
+          },
+        ],
         "columns": [
           "Trap",
           "Trigger",
         ],
-        "left": {
-          "id": "room.7.left",
-          "value": "Freezes",
-        },
-        "right": {
-          "id": "room.7.right",
-          "value": "Activating",
-        },
       },
       "type": "Trap",
     },
@@ -450,23 +466,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.8.detail.0",
-          "value": "A crude tally scratched into the stone",
+          "value": "A colonies of pale mushrooms",
         },
       ],
       "id": 8,
       "roll": {
+        "cells": [
+          {
+            "id": "room.8.col.0",
+            "value": "Den",
+          },
+          {
+            "id": "room.8.col.1",
+            "value": "Decor",
+          },
+        ],
         "columns": [
           "Room Type",
           "Clue",
         ],
-        "left": {
-          "id": "room.8.left",
-          "value": "Stable",
-        },
-        "right": {
-          "id": "room.8.right",
-          "value": "Decay",
-        },
       },
       "type": "Lore",
     },
@@ -474,23 +492,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.9.detail.0",
-          "value": "A length of rotted rope",
+          "value": "Shattered wooden crates",
         },
       ],
       "id": 9,
       "roll": {
+        "cells": [
+          {
+            "id": "room.9.col.0",
+            "value": "Infects",
+          },
+          {
+            "id": "room.9.col.1",
+            "value": "Activating",
+          },
+        ],
         "columns": [
           "Trap",
           "Trigger",
         ],
-        "left": {
-          "id": "room.9.left",
-          "value": "Cuts",
-        },
-        "right": {
-          "id": "room.9.right",
-          "value": "Pulling",
-        },
       },
       "type": "Trap",
     },
@@ -498,28 +518,26 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.10.detail.0",
-          "value": "A dead rat, half-rotted",
+          "value": "Dead vermin",
         },
       ],
+      "family": "Viper",
       "id": 10,
       "monster": {
         "id": "room.10.monster",
-        "value": "Ogre",
+        "value": "Viper",
       },
       "occupantFaction": 1,
       "roll": {
+        "cells": [
+          {
+            "id": "room.10.col.0",
+            "value": "Protecting",
+          },
+        ],
         "columns": [
-          "Group",
           "Activity",
         ],
-        "left": {
-          "id": "room.10.left",
-          "value": "Goblinoid",
-        },
-        "right": {
-          "id": "room.10.right",
-          "value": "Killing",
-        },
       },
       "type": "Monster",
     },
@@ -527,23 +545,25 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.11.detail.0",
-          "value": "Mud tracked in a long smear",
+          "value": "A shallow puddle of water",
         },
       ],
       "id": 11,
       "roll": {
+        "cells": [
+          {
+            "id": "room.11.col.0",
+            "value": "Cuts",
+          },
+          {
+            "id": "room.11.col.1",
+            "value": "Entering",
+          },
+        ],
         "columns": [
           "Trap",
           "Trigger",
         ],
-        "left": {
-          "id": "room.11.left",
-          "value": "Confuses",
-        },
-        "right": {
-          "id": "room.11.right",
-          "value": "Entering",
-        },
       },
       "type": "Trap",
     },
@@ -551,28 +571,26 @@ exports[`generate > matches the pinned snapshot 1`] = `
       "details": [
         {
           "id": "room.12.detail.0",
-          "value": "A scattering of small animal bones",
+          "value": "Human bones, picked clean",
         },
       ],
+      "family": "Humanfolk",
       "id": 12,
       "monster": {
         "id": "room.12.monster",
-        "value": "Gargoyle",
+        "value": "Hooded Men",
       },
       "occupantFaction": 0,
       "roll": {
+        "cells": [
+          {
+            "id": "room.12.col.0",
+            "value": "Scheming",
+          },
+        ],
         "columns": [
-          "Group",
           "Activity",
         ],
-        "left": {
-          "id": "room.12.left",
-          "value": "Construct",
-        },
-        "right": {
-          "id": "room.12.right",
-          "value": "Fighting",
-        },
       },
       "type": "Monster",
     },

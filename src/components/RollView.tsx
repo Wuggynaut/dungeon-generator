@@ -57,6 +57,20 @@ function Cell({ label, slotId, value, controls, rerollable = true }: CellProps) 
     );
 }
 
+// Renders a subtable child roll indented under its parent value.
+function SubCells({ roll, controls }: { roll: Roll; controls: SlotControls }) {
+    return (
+        <div style={{ marginLeft: "1rem", borderLeft: "2px solid var(--color-border, #ddd)", paddingLeft: "0.5rem" }}>
+            {roll.columns.map((label, i) => (
+                <div key={roll.cells[i].id}>
+                    <Cell label={label} slotId={roll.cells[i].id} value={roll.cells[i].value} controls={controls} />
+                    {roll.subrolls?.[i] && <SubCells roll={roll.subrolls[i]!} controls={controls} />}
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export default function RollView({
                                      roll,
                                      controls,
@@ -70,11 +84,19 @@ export default function RollView({
     extra?: { label: string; slot: Slot; rerollable?: boolean };
     extras?: { label: string; slot: Slot; rerollable?: boolean }[];
 }) {
+    const hasSubs = roll.subrolls?.some(Boolean) ?? false;
     return (
         <div className={layout === "compact" ? styles.compact : undefined}>
-            {roll.columns.map((label, i) => (
-                <Cell key={roll.cells[i].id} label={label} slotId={roll.cells[i].id} value={roll.cells[i].value} controls={controls} />
-            ))}
+            {hasSubs
+                ? roll.columns.map((label, i) => (
+                    <div key={roll.cells[i].id}>
+                        <Cell label={label} slotId={roll.cells[i].id} value={roll.cells[i].value} controls={controls} />
+                        {roll.subrolls?.[i] && <SubCells roll={roll.subrolls[i]!} controls={controls} />}
+                    </div>
+                ))
+                : roll.columns.map((label, i) => (
+                    <Cell key={roll.cells[i].id} label={label} slotId={roll.cells[i].id} value={roll.cells[i].value} controls={controls} />
+                ))}
             {extra && (
                 <Cell label={extra.label} slotId={extra.slot.id} value={extra.slot.value} controls={controls} rerollable={extra.rerollable} />
             )}

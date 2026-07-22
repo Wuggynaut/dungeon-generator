@@ -1,6 +1,6 @@
-import type {Detail, Overrides, Roll, Slot, Table} from "../types/rollTypes.ts";
+import type {Detail, Overrides, Roll, Slot, Subtables, Table} from "../types/rollTypes.ts";
 import {makeChildRng} from "./rng.ts";
-import {resolveColumn} from "./data/columnSources.ts";
+import {resolveColumn, subtableFor} from "./data/columnSources.ts";
 
 const MAX_REROLL_TRIES = 50;
 
@@ -67,7 +67,7 @@ function weightedPickWithCount(seed: string, values: string[], weights: number[]
 }
 
 // Choose a detail filtered and weighted by a room's context.
-//   eligible: every `requires` tag is in the context (suppression)
+//   eligible: every `requires` tag is in the context
 //   weight:   base + AFFINITY_BOOST per `affinity` tag present
 export function selectDetail(
     seed: string,
@@ -110,10 +110,21 @@ export function rollTable(
     table: Table,
     baseId: string,
     overrides: Overrides = {},
+    subtables?: Subtables,
 ): Roll {
-    return {
-        columns: table.columns.map(c => c.label),
-        cells: table.columns.map((c, i) =>
-            rollOne(seed, resolveColumn(c.values), `${baseId}.col.${i}`, overrides)),
-    };
+    const columns = table.columns.map(c => c.label);
+    const cells = table.columns.map((c, i) =>
+        rollOne(seed, resolveColumn(c.values), `${baseId}.col.${i}`, overrides));
+
+    if (!subtables) return { columns, cells };
+
+    const subrolls = table.columns.map((c, i) => {
+        const id = subtableFor(c.values, cells[i].value);
+        const child = id ? subtables[id] : undefined;
+        return child
+            ? rollTable(seed, child, `${baseId}.col.${i}.sub`, overrides, subtables)
+            : null;
+    });
+    if (subrolls.every(s => s === null)) return { columns, cells };
+    return { columns, cells, subrolls };
 }

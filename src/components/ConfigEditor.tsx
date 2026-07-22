@@ -74,6 +74,16 @@ export function ConfigEditor({ config, onChange }: ConfigEditorProps) {
                     />
                 </label>
             </div>
+            <div>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={config.resolveDetails}
+                        onChange={e => onChange({ ...config, resolveDetails: e.target.checked })}
+                    />{" "}
+                    Resolve room details
+                </label>
+            </div>
         </section>
     );
 }

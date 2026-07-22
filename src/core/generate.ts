@@ -4,6 +4,7 @@ import { rollTable, rollOne, rollValueWithCount, selectDetail } from "./rolls.ts
 import {groupNames, monstersByGroup} from "./data/monsters.ts";
 import {dressing} from "./data/dressing.ts";
 import {roomContext} from "./context.ts";
+import {subtables} from "./data/subtables.ts";
 import { type Config, defaultConfig, type Tables } from "./config.ts";
 import { generateMap } from "./map.ts";
 
@@ -54,7 +55,6 @@ function sampleOccupantOnce(seed: string, factions: Faction[], label: string): n
     return null; // fell into the unaligned slice
 }
 
-// A faction index or null (unaligned).
 function sampleOccupantIndex(
     seed: string,
     roomId: number,
@@ -102,7 +102,7 @@ function generateRooms(
     for (let id = 1; id <= count; id++) {
         const typeCount = overrides[`room.${id}.type`]?.rerollCount ?? 0;
         const rt = roomTypeAtCount(seed, pool, id, typeCount);
-        const roll = rollTable(seed, rt.table, `room.${id}`, overrides);
+        const roll = rollTable(seed, rt.table, `room.${id}`, overrides, subtables);
         const room: Room = { id, type: rt.name, roll };
 
         // The monster room's first column is the family (a ref to the bestiary).
@@ -139,9 +139,11 @@ export function generate(seed: string, config: Config = defaultConfig, overrides
     const dungeon: Dungeon = { seed, history, denizens, factions, rooms, map };
 
     // Details chosen last, against each room's full context.
-    for (const room of rooms) {
-        const context = roomContext(dungeon, room);
-        room.details = [selectDetail(seed, dressing, context, `room.${room.id}.detail.0`, overrides)];
+    if (config.resolveDetails) {
+        for (const room of rooms) {
+            const context = roomContext(dungeon, room);
+            room.details = [selectDetail(seed, dressing, context, `room.${room.id}.detail.0`, overrides)];
+        }
     }
 
     return dungeon;
