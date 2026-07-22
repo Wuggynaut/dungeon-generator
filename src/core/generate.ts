@@ -3,7 +3,7 @@ import {makeChildRng, pickWeighted, type Rng} from "./rng.ts";
 import { rollTable, rollOne, rollValueWithCount, selectDetail } from "./rolls.ts";
 import {groupNames, monstersByGroup} from "./data/monsters.ts";
 import {dressing} from "./data/dressing.ts";
-import {roomContext} from "./context.ts";
+import {roomContext, baseContext} from "./context.ts";
 import {subtables} from "./data/subtables.ts";
 import { type Config, defaultConfig, type Tables } from "./config.ts";
 import { generateMap } from "./map.ts";
@@ -97,12 +97,13 @@ function generateRooms(
     count: number,
     overrides: Overrides,
     factions: Faction[],
+    context: Set<string>,
 ): Room[] {
     const rooms: Room[] = [];
     for (let id = 1; id <= count; id++) {
         const typeCount = overrides[`room.${id}.type`]?.rerollCount ?? 0;
         const rt = roomTypeAtCount(seed, pool, id, typeCount);
-        const roll = rollTable(seed, rt.table, `room.${id}`, overrides, subtables);
+        const roll = rollTable(seed, rt.table, `room.${id}`, overrides, subtables, context);
         const room: Room = { id, type: rt.name, roll };
 
         // The monster room's first column is the family (a ref to the bestiary).
@@ -133,7 +134,7 @@ export function generate(seed: string, config: Config = defaultConfig, overrides
     const history = generateHistory(seed, config.tables, overrides);
     const denizens = generateDenizens(seed, config.tables, overrides);
     const factions = generateFactions(seed, config.tables.agendas, config.factionCount, overrides);
-    const rooms = generateRooms(seed, config.roomTypes, config.roomCount, overrides, factions);
+    const rooms = generateRooms(seed, config.roomTypes, config.roomCount, overrides, factions, baseContext(history, factions));
     const map = generateMap(makeChildRng(seed, "map"), rooms, overrides);
 
     const dungeon: Dungeon = { seed, history, denizens, factions, rooms, map };

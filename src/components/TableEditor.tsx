@@ -3,6 +3,7 @@ import { resolveColumn } from "../core/data/columnSources.ts";
 import { IconButton } from "./IconButton.tsx";
 import { TrashIcon } from "./icons/TrashIcon.tsx";
 import { PlusIcon } from "./icons/PlusIcon.tsx";
+import { TagInput } from "./TagInput.tsx";
 import styles from "./TableEditor.module.css";
 
 type TableEditorProps = {
@@ -32,11 +33,21 @@ export function TableEditor({ table, onChange }: TableEditorProps) {
         mapLiteral(ci, values => values.map((v, j) =>
             (j === vi ? (typeof v === "string" ? value : { ...v, value }) : v)));
     const addValue = (ci: number) => mapLiteral(ci, values => [...values, ""]);
-    const setSubtable = (ci: number, vi: number, id: string) =>
+    const setField = (
+        ci: number, vi: number,
+        patch: Partial<{ subtable: string; requires: string[]; affinity: string[]; weight: number }>,
+    ) =>
         mapLiteral(ci, values => values.map((v, j) => {
             if (j !== vi) return v;
-            const value = typeof v === "string" ? v : v.value;
-            return id ? { value, subtable: id } : value; // empty id -> back to a plain string
+            const obj: { value: string; subtable?: string; requires?: string[]; affinity?: string[]; weight?: number } =
+                typeof v === "string" ? { value: v } : { ...v };
+            const next = { ...obj, ...patch };
+            if (!next.subtable) delete next.subtable;
+            if (!next.requires?.length) delete next.requires;
+            if (!next.affinity?.length) delete next.affinity;
+            if (next.weight === undefined) delete next.weight;
+            const { value, ...meta } = next;
+            return Object.keys(meta).length === 0 ? value : next;
         }));
     const removeValue = (ci: number, vi: number) =>
         mapLiteral(ci, values => values.filter((_, j) => j !== vi));
@@ -74,25 +85,25 @@ export function TableEditor({ table, onChange }: TableEditorProps) {
                                 </div>
                             ) : (
                                 <>
-                                    {values.map((v, vi) => (
-                                        <div key={vi} className={styles.valueRow}>
-                                            <input
-                                                className={styles.cellInput}
-                                                value={valueText(v)}
-                                                onChange={e => setValue(ci, vi, e.target.value)}
-                                            />
-                                            <input
-                                                className={styles.cellInput}
-                                                style={{ maxWidth: "8rem", opacity: 0.8 }}
-                                                placeholder="subtable id"
-                                                value={typeof v === "string" ? "" : (v.subtable ?? "")}
-                                                onChange={e => setSubtable(ci, vi, e.target.value)}
-                                            />
-                                            <IconButton label="Remove value" disabled={values.length === 1} onClick={() => removeValue(ci, vi)}>
-                                                <TrashIcon />
-                                            </IconButton>
-                                        </div>
-                                    ))}
+                                    {values.map((v, vi) => {
+                                        const obj = typeof v === "object" ? v : null;
+                                        return (
+                                            <div key={vi} className={styles.valueRow} style={{ flexDirection: "column", alignItems: "stretch" }}>
+                                                <div style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
+                                                    <input className={styles.cellInput} value={valueText(v)} onChange={e => setValue(ci, vi, e.target.value)} />
+                                                    <IconButton label="Remove value" disabled={values.length === 1} onClick={() => removeValue(ci, vi)}>
+                                                        <TrashIcon />
+                                                    </IconButton>
+                                                </div>
+                                                <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", fontSize: "0.75em", opacity: 0.7, marginLeft: "0.25rem" }}>
+                                                    <label>sub <input style={{ width: "7rem" }} placeholder="id" value={obj?.subtable ?? ""} onChange={e => setField(ci, vi, { subtable: e.target.value })} /></label>
+                                                    <label>req <TagInput value={obj?.requires ?? []} onChange={requires => setField(ci, vi, { requires })} /></label>
+                                                    <label>aff <TagInput value={obj?.affinity ?? []} onChange={affinity => setField(ci, vi, { affinity })} /></label>
+                                                    <label>wt <input type="number" style={{ width: "3.5rem" }} value={obj?.weight ?? ""} onChange={e => setField(ci, vi, { weight: e.target.value === "" ? undefined : Number(e.target.value) })} /></label>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                     <button type="button" className={styles.addRow} onClick={() => addValue(ci)}>
                                         <PlusIcon className={styles.addIcon} /> Add value
                                     </button>

@@ -1,4 +1,4 @@
-import type { Dungeon, Faction, Room } from "../types/rollTypes.ts";
+import type { Dungeon, Faction, History, Room } from "../types/rollTypes.ts";
 import { familyByName } from "./data/monsters.ts";
 import { kindOf } from "./data/constructionKind.ts";
 import { tagsForPurpose } from "./data/purposeTags.ts";
@@ -12,14 +12,29 @@ export function dominantFactionIndex(factions: Faction[]): number | null {
     return best;
 }
 
-export function roomContext(dungeon: Dungeon, room: Room): Set<string> {
+// Dungeon-wide tags: the construction axis and the purpose affinities.
+function dungeonTags(history: History): Set<string> {
     const ctx = new Set<string>();
+    ctx.add(kindOf(history.construction.cells[1].value));
+    for (const tag of tagsForPurpose(history.purpose.cells[0].value)) ctx.add(tag);
+    return ctx;
+}
 
-    ctx.add(kindOf(dungeon.history.construction.cells[1].value));
-
-    for (const tag of tagsForPurpose(dungeon.history.purpose.cells[0].value)) {
-        ctx.add(tag);
+// Context available before rooms are filled: dungeon tags plus the dominant
+// faction as the ambient denizen. Used to condition each room's own table roll.
+export function baseContext(history: History, factions: Faction[]): Set<string> {
+    const ctx = dungeonTags(history);
+    const dom = dominantFactionIndex(factions);
+    if (dom !== null) {
+        const fam = familyByName[factions[dom].group.value];
+        if (fam) for (const tag of fam.tags) ctx.add(tag);
     }
+    return ctx;
+}
+
+
+export function roomContext(dungeon: Dungeon, room: Room): Set<string> {
+    const ctx = dungeonTags(dungeon.history);
 
     let family: string | undefined;
     let species: string | undefined;

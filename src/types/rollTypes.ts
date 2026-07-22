@@ -2,7 +2,9 @@ import type {DungeonMap} from "./mapTypes.ts";
 
 // A column value is a bare string, or an object that names a subtable to roll
 // when this value comes up.
-export type ColumnValue = string | { value: string; subtable?: string };
+export type ColumnValue =
+    | string
+    | { value: string; subtable?: string; requires?: string[]; affinity?: string[]; weight?: number };
 
 export type ColumnValues = ColumnValue[] | { ref: string }; // inline list, or a named source
 

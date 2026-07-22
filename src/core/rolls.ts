@@ -1,6 +1,6 @@
 import type {Detail, Overrides, Roll, Slot, Subtables, Table} from "../types/rollTypes.ts";
 import {makeChildRng} from "./rng.ts";
-import {resolveColumn, subtableFor} from "./data/columnSources.ts";
+import {resolveColumn, subtableFor, columnOptions, columnIsTagged, type TaggedOption} from "./data/columnSources.ts";
 
 const MAX_REROLL_TRIES = 50;
 
@@ -66,9 +66,31 @@ function weightedPickWithCount(seed: string, values: string[], weights: number[]
     return previous;
 }
 
-// Choose a detail filtered and weighted by a room's context.
-//   eligible: every `requires` tag is in the context
-//   weight:   base + AFFINITY_BOOST per `affinity` tag present
+// Choose a value from tagged options, filtered and weighted by context.
+export function selectTagged(
+    seed: string,
+    options: TaggedOption[],
+    context: Set<string> | undefined,
+    slotId: string,
+    overrides: Overrides = {},
+): Slot {
+    const override = overrides[slotId];
+    if (override?.editValue !== undefined) return { id: slotId, value: override.editValue };
+
+    const pool = context
+        ? options.filter(o => (o.requires ?? []).every(t => context.has(t)))
+        : options;
+    if (pool.length === 0) return { id: slotId, value: "" };
+
+    const values = pool.map(o => o.value);
+    const weights = pool.map(o =>
+        (o.weight ?? 1) + (context ? AFFINITY_BOOST * (o.affinity ?? []).filter(t => context.has(t)).length : 0));
+
+    const count = override?.rerollCount ?? 0;
+    return { id: slotId, value: weightedPickWithCount(seed, values, weights, slotId, count) };
+}
+
+// Dressing details are tagged options keyed by `text`.
 export function selectDetail(
     seed: string,
     details: Detail[],
@@ -76,18 +98,11 @@ export function selectDetail(
     slotId: string,
     overrides: Overrides = {},
 ): Slot {
-    const override = overrides[slotId];
-    if (override?.editValue !== undefined) return { id: slotId, value: override.editValue };
-
-    const eligible = details.filter(d => (d.requires ?? []).every(t => context.has(t)));
-    if (eligible.length === 0) return { id: slotId, value: "" };
-
-    const values = eligible.map(d => d.text);
-    const weights = eligible.map(d =>
-        (d.weight ?? 1) + AFFINITY_BOOST * (d.affinity ?? []).filter(t => context.has(t)).length);
-
-    const count = override?.rerollCount ?? 0;
-    return { id: slotId, value: weightedPickWithCount(seed, values, weights, slotId, count) };
+    return selectTagged(
+        seed,
+        details.map(d => ({ value: d.text, requires: d.requires, affinity: d.affinity, weight: d.weight })),
+        context, slotId, overrides,
+    );
 }
 
 // Roll a value from a list using an explicit reroll count (not read from overrides).
@@ -111,10 +126,15 @@ export function rollTable(
     baseId: string,
     overrides: Overrides = {},
     subtables?: Subtables,
+    context?: Set<string>,
 ): Roll {
     const columns = table.columns.map(c => c.label);
-    const cells = table.columns.map((c, i) =>
-        rollOne(seed, resolveColumn(c.values), `${baseId}.col.${i}`, overrides));
+    const cells = table.columns.map((c, i) => {
+        const slotId = `${baseId}.col.${i}`;
+        return context && columnIsTagged(c.values)
+            ? selectTagged(seed, columnOptions(c.values), context, slotId, overrides)
+            : rollOne(seed, resolveColumn(c.values), slotId, overrides);
+    });
 
     if (!subtables) return { columns, cells };
 

@@ -2,7 +2,9 @@ import type { Detail, Family, Subtables, Table, ColumnValues } from "../types/ro
 import type { ConstructionKind } from "./data/constructionKind.ts";
 
 // Serializers that turn an edited corpus back into its source .ts file. The
-// Setup editors call these; copy or download the result and commit it.
+// Setup editors call these; you copy or download the result and commit it. The
+// derived exports below each array are fixed boilerplate reproduced verbatim.
+// Note: hand-written inline comments in the source files are not preserved.
 
 const S = (x: string) => JSON.stringify(x);
 const list = (xs: string[]) => `[${xs.map(S).join(", ")}]`;
@@ -81,10 +83,15 @@ export const monstersByGroup: Record<string, string[]> =
 
 function serializeColumnValues(values: ColumnValues): string {
     if (!Array.isArray(values)) return `{ ref: ${S(values.ref)} }`;
-    const items = values.map(v =>
-        typeof v === "string"
-            ? S(v)
-            : `{ value: ${S(v.value)}${v.subtable ? `, subtable: ${S(v.subtable)}` : ""} }`);
+    const items = values.map(v => {
+        if (typeof v === "string") return S(v);
+        const parts = [`value: ${S(v.value)}`];
+        if (v.subtable) parts.push(`subtable: ${S(v.subtable)}`);
+        if (v.requires?.length) parts.push(`requires: ${list(v.requires)}`);
+        if (v.affinity?.length) parts.push(`affinity: ${list(v.affinity)}`);
+        if (v.weight !== undefined) parts.push(`weight: ${v.weight}`);
+        return `{ ${parts.join(", ")} }`;
+    });
     return `[${items.join(", ")}]`;
 }
 
