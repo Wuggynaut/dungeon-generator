@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Table, Column, ColumnValue, ColumnValues } from "../types/rollTypes.ts";
 import { resolveColumn } from "../core/data/columnSources.ts";
 import { IconButton } from "./IconButton.tsx";
@@ -22,6 +23,16 @@ const valueText = (v: ColumnValue): string => (typeof v === "string" ? v : v.val
 // like the bestiary) shows read-only; you change it by editing the source.
 export function TableEditor({ table, onChange }: TableEditorProps) {
     const cols = table.columns;
+
+    // Per-value metadata (subtable id, tags, weight) is hidden behind a toggle so
+    // columns keep their normal width. Keyed by "col:value" index.
+    const [expanded, setExpanded] = useState<Set<string>>(new Set());
+    const toggleMeta = (key: string) =>
+        setExpanded(prev => {
+            const next = new Set(prev);
+            if (next.has(key)) next.delete(key); else next.add(key);
+            return next;
+        });
     const update = (next: Column[]) => onChange({ ...table, columns: next });
 
     const mapLiteral = (ci: number, fn: (values: ColumnValue[]) => ColumnValue[]) =>
@@ -87,20 +98,34 @@ export function TableEditor({ table, onChange }: TableEditorProps) {
                                 <>
                                     {values.map((v, vi) => {
                                         const obj = typeof v === "object" ? v : null;
+                                        const hasMeta = !!(obj && (obj.subtable || obj.requires?.length || obj.affinity?.length || obj.weight !== undefined));
+                                        const key = `${ci}:${vi}`;
+                                        const open = expanded.has(key);
+                                        const metaLabel = { display: "flex", gap: "0.3rem", alignItems: "center" } as const;
                                         return (
                                             <div key={vi} className={styles.valueRow} style={{ flexDirection: "column", alignItems: "stretch" }}>
                                                 <div style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
                                                     <input className={styles.cellInput} value={valueText(v)} onChange={e => setValue(ci, vi, e.target.value)} />
+                                                    <button
+                                                        type="button"
+                                                        title="value options: subtable, tags, weight"
+                                                        onClick={() => toggleMeta(key)}
+                                                        style={{ fontSize: "0.7rem", lineHeight: 1, padding: "0.15rem 0.35rem", fontWeight: hasMeta ? 700 : 400, opacity: hasMeta || open ? 1 : 0.45 }}
+                                                    >
+                                                        {open ? "▾" : "…"}
+                                                    </button>
                                                     <IconButton label="Remove value" disabled={values.length === 1} onClick={() => removeValue(ci, vi)}>
                                                         <TrashIcon />
                                                     </IconButton>
                                                 </div>
-                                                <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", fontSize: "0.75em", opacity: 0.7, marginLeft: "0.25rem" }}>
-                                                    <label>sub <input style={{ width: "7rem" }} placeholder="id" value={obj?.subtable ?? ""} onChange={e => setField(ci, vi, { subtable: e.target.value })} /></label>
-                                                    <label>req <TagInput value={obj?.requires ?? []} onChange={requires => setField(ci, vi, { requires })} /></label>
-                                                    <label>aff <TagInput value={obj?.affinity ?? []} onChange={affinity => setField(ci, vi, { affinity })} /></label>
-                                                    <label>wt <input type="number" style={{ width: "3.5rem" }} value={obj?.weight ?? ""} onChange={e => setField(ci, vi, { weight: e.target.value === "" ? undefined : Number(e.target.value) })} /></label>
-                                                </div>
+                                                {open && (
+                                                    <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.78em", opacity: 0.85, margin: "0.25rem 0 0.4rem 0.5rem" }}>
+                                                        <label style={metaLabel}>subtable <input style={{ flex: 1, minWidth: 0 }} placeholder="id" value={obj?.subtable ?? ""} onChange={e => setField(ci, vi, { subtable: e.target.value })} /></label>
+                                                        <label style={metaLabel}>requires <TagInput value={obj?.requires ?? []} onChange={requires => setField(ci, vi, { requires })} /></label>
+                                                        <label style={metaLabel}>affinity <TagInput value={obj?.affinity ?? []} onChange={affinity => setField(ci, vi, { affinity })} /></label>
+                                                        <label style={metaLabel}>weight <input type="number" style={{ width: "4rem" }} value={obj?.weight ?? ""} onChange={e => setField(ci, vi, { weight: e.target.value === "" ? undefined : Number(e.target.value) })} /></label>
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })}
