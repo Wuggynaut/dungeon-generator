@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { tokenizeTable } from '../src/core/markdownTable.ts';
+import { subtableRoutes } from '../src/core/data/subtables.ts';
 
 const [, , input, output] = process.argv;
 const md = readFileSync(input, "utf8");
@@ -71,20 +72,7 @@ const literalColumn = (label: string, values: string[], routes?: Record<string, 
     return `    { label: ${quote(label)}, values: [${items.join(", ")}] },`;
 };
 
-// table -> column label -> rolled value -> subtable id. Baked onto the value so
-// it carries its own route (see the subtables registry in src/core/data).
-const SUBTABLE_ROUTES: Record<string, Record<string, Record<string, string>>> = {
-    special: {
-        Special: {
-            Mirror: "mirror-specifics",
-            Pool: "pool-specifics",
-            Statue: "statue-specifics",
-            Door: "door-specifics",
-            Writing: "writing-specifics",
-            Treasure: "treasure-specifics",
-        },
-    },
-};
+const SUBTABLE_ROUTES = subtableRoutes;
 
 const refColumn = (label: string, ref: string) =>
     `    { label: ${quote(label)}, values: { ref: ${quote(ref)} } },`;

@@ -1,5 +1,6 @@
 import PoissonDiskSampling from "poisson-disk-sampling";
 import type { Rng } from "./rng.ts";
+import * as slots from "./slots.ts";
 import type {DungeonMap, MapEdge, MapNode, PathType, Point} from "../types/mapTypes.ts";
 import { Delaunay } from "d3-delaunay";
 import type {Overrides, Room} from "../types/rollTypes.ts";
@@ -343,11 +344,6 @@ function cutoffSizes(tree: Edge[], nodeCount: number, root: number): Map<string,
     return sizes;
 }
 
-// Stable id for the corridor between two rooms. Smaller roomId is first.
-export function edgeSlotId(a: number, b: number): string {
-    return `edge.${Math.min(a,b)}.${Math.max(a,b)}`;
-}
-
 function isPathType(value: string | undefined): value is PathType {
     return value === "standard" || value === "conditional" || value === "hidden";
 }
@@ -387,7 +383,7 @@ export function generateMap(rng: Rng, rooms: Room[], overrides: Overrides = {}):
         const a = roomIdOf(edge.a);
         const b = roomIdOf(edge.b);
         const generated = pathTypeFor(edge);
-        const override = overrides[edgeSlotId(a, b)]?.editValue;
+        const override = overrides[slots.edge(a, b)]?.editValue;
         mapEdges.push({
             a,
             b,

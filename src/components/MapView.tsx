@@ -1,4 +1,5 @@
-import {CANVAS_WIDTH, CANVAS_HEIGHT, edgeSlotId} from "../core/map.ts";
+import {CANVAS_WIDTH, CANVAS_HEIGHT} from "../core/map.ts";
+import {edge as edgeSlotId} from "../core/slots.ts";
 import { hashSeed } from "../core/rng.ts";
 import type {DungeonMap, MapNode, PathType, Point} from "../types/mapTypes.ts";
 import type {Room, SlotControls} from "../types/rollTypes.ts";

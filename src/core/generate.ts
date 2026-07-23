@@ -1,5 +1,6 @@
 import type { Denizens, Dungeon, Faction, History, Overrides, Table, Room, RoomType } from "../types/rollTypes.ts";
 import {makeChildRng, pickWeighted, type Rng} from "./rng.ts";
+import * as slots from "./slots.ts";
 import { rollTable, rollOne, rollValueWithCount, selectDetail } from "./rolls.ts";
 import {groupNames, monstersByGroup} from "./data/monsters.ts";
 import {dressing} from "./data/dressing.ts";
@@ -13,16 +14,16 @@ const UNALIGNED_WEIGHT = 1; // How likely a monster room belongs to no faction, 
 
 function generateHistory(seed: string, tables: Tables, overrides: Overrides): History {
     return {
-        purpose:      rollTable(seed, tables.purpose,      "history.purpose",      overrides),
-        construction: rollTable(seed, tables.construction, "history.construction", overrides),
-        ruination:    rollTable(seed, tables.ruination,    "history.ruination",    overrides),
+        purpose:      rollTable(seed, tables.purpose,      slots.history.purpose,      overrides),
+        construction: rollTable(seed, tables.construction, slots.history.construction, overrides),
+        ruination:    rollTable(seed, tables.ruination,    slots.history.ruination,    overrides),
     };
 }
 
 function generateDenizens(seed: string, tables: Tables, overrides: Overrides): Denizens {
     return {
-        attitude:    rollTable(seed, tables.traits, "denizens.attitude",    overrides),
-        standoutNPC: rollTable(seed, tables.traits, "denizens.standoutNPC", overrides),
+        attitude:    rollTable(seed, tables.traits, slots.denizens.attitude,    overrides),
+        standoutNPC: rollTable(seed, tables.traits, slots.denizens.standoutNPC, overrides),
     };
 }
 
@@ -31,12 +32,12 @@ const FACTION_STRENGTH_SIDES = 3; // strength is 1..3; it weights room occupancy
 function generateFactions(seed: string, agendas: Table, count: number, overrides: Overrides): Faction[] {
     const factions: Faction[] = [];
     for (let i = 0; i < count; i++) {
-        const group = rollOne(seed, groupNames, `faction.${i}.group`, overrides);
-        const strength = makeChildRng(seed, `faction.${i}.strength`).die(FACTION_STRENGTH_SIDES);
+        const group = rollOne(seed, groupNames, slots.faction.group(i), overrides);
+        const strength = makeChildRng(seed, slots.faction.strength(i)).die(FACTION_STRENGTH_SIDES);
         factions.push({
             group,
             strength,
-            agenda: rollTable(seed, agendas, `faction.${i}.agenda`, overrides),
+            agenda: rollTable(seed, agendas, slots.faction.agenda(i), overrides),
         });
     }
     return factions;
@@ -61,20 +62,20 @@ function sampleOccupantIndex(
     factions: Faction[],
     count: number,
 ): number | null {
-    const base = `room.${roomId}.occupant`;
+    const base = slots.room.occupant(roomId);
     if (count === 0) return sampleOccupantOnce(seed, factions, base);
 
     const previous = sampleOccupantIndex(seed, roomId, factions, count - 1);
     for (let t = 0; t < MAX_TYPE_REROLL_TRIES; t++) {
-        const candidate = sampleOccupantOnce(seed, factions, `${base}#${count}.${t}`);
+        const candidate = sampleOccupantOnce(seed, factions, slots.rerollTry(base, count, t));
         if (candidate !== previous) return candidate;
     }
     return previous; // give up: only one possible outcome
 }
 
 function roomTypeAtCount(seed: string, pool: RoomType[], roomId: number, count: number): RoomType {
-    const slotId = `room.${roomId}.type`;
-    const label = count > 0 ? `${slotId}#${count}` : slotId;
+    const slotId = slots.room.type(roomId);
+    const label = slots.reroll(slotId, count);
     const rng = makeChildRng(seed, label);
 
     if (count === 0) return pickRoomType(rng, pool);
@@ -101,27 +102,27 @@ function generateRooms(
 ): Room[] {
     const rooms: Room[] = [];
     for (let id = 1; id <= count; id++) {
-        const typeCount = overrides[`room.${id}.type`]?.rerollCount ?? 0;
+        const typeCount = overrides[slots.room.type(id)]?.rerollCount ?? 0;
         const rt = roomTypeAtCount(seed, pool, id, typeCount);
-        const roll = rollTable(seed, rt.table, `room.${id}`, overrides, subtables, context);
+        const roll = rollTable(seed, rt.table, slots.room.base(id), overrides, subtables, context);
         const room: Room = { id, type: rt.name, roll };
 
         // The monster room's first column is the family (a ref to the bestiary).
         if (rt.name === "Monster") {
-            const occCount = overrides[`room.${id}.occupant`]?.rerollCount ?? 0;
+            const occCount = overrides[slots.room.occupant(id)]?.rerollCount ?? 0;
             const idx = sampleOccupantIndex(seed, id, factions, occCount);
-            const creatureCount = overrides[`room.${id}.monster`]?.rerollCount ?? 0;
+            const creatureCount = overrides[slots.room.monster(id)]?.rerollCount ?? 0;
 
             let family: string;
             if (idx !== null) {
                 room.occupantFaction = idx;
                 family = factions[idx].group.value; // aligned: the faction's family (fixed)
             } else {
-                family = rollValueWithCount(seed, groupNames, `room.${id}.family`, creatureCount);
+                family = rollValueWithCount(seed, groupNames, slots.room.family(id), creatureCount);
             }
             room.family = family;
             const roster = monstersByGroup[family] ?? [];
-            room.monster = rollOne(seed, roster, `room.${id}.monster`, overrides);
+            room.monster = rollOne(seed, roster, slots.room.monster(id), overrides);
         }
 
 
@@ -143,7 +144,7 @@ export function generate(seed: string, config: Config = defaultConfig, overrides
     if (config.resolveDetails) {
         for (const room of rooms) {
             const context = roomContext(dungeon, room);
-            room.details = [selectDetail(seed, dressing, context, `room.${room.id}.detail.0`, overrides)];
+            room.details = [selectDetail(seed, dressing, context, slots.room.detail(room.id, 0), overrides)];
         }
     }
 

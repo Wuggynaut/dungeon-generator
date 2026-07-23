@@ -3,6 +3,7 @@ import RollView from "./RollView.tsx";
 import { IconButton } from "./IconButton.tsx";
 import { DiceIcon } from "./icons/DiceIcon.tsx";
 import { monstersByGroup } from "../core/data/monsters.ts";
+import * as slots from "../core/slots.ts";
 import styles from "./RoomList.module.css";
 
 type RoomListProps = {
@@ -37,7 +38,7 @@ export function RoomList({ rooms, numberByRoomId, selected, onSelect, controls }
                                     label="Reroll room type"
                                     onClick={e => {
                                         e.stopPropagation();
-                                        controls.reroll(`room.${room.id}.type`);
+                                        controls.reroll(slots.room.type(room.id));
                                     }}
                                 >
                                     <DiceIcon />
@@ -65,7 +66,7 @@ export function RoomList({ rooms, numberByRoomId, selected, onSelect, controls }
                                         <span>{unaligned ? "Unaligned" : `Held by Faction ${room.occupantFaction! + 1}`}</span>
                                         <IconButton
                                             label="Reroll allegiance"
-                                            onClick={e => { e.stopPropagation(); controls.reroll(`room.${room.id}.occupant`); }}
+                                            onClick={e => { e.stopPropagation(); controls.reroll(slots.room.occupant(room.id)); }}
                                         >
                                             <DiceIcon />
                                         </IconButton>

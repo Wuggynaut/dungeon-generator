@@ -23,6 +23,14 @@ describe("context-conditioned column values", () => {
         expect(sample(undefined).some(v => v === "Bath")).toBe(true);
     });
 
+    it("falls back to the full list when requires filters everything out", () => {
+        const allBuilt: Table = {
+            columns: [{ label: "Room", values: [{ value: "Bath", requires: ["built"] }, { value: "Forge", requires: ["built"] }] }],
+        };
+        const value = rollTable("seed", allBuilt, "z", {}, undefined, new Set(["natural"])).cells[0].value;
+        expect(value === "Bath" || value === "Forge").toBe(true); // not ""
+    });
+
     it("leaves an untagged column unchanged with or without context", () => {
         const plain: Table = { columns: [{ label: "X", values: ["a", "b", "c"] }] };
         const withCtx = rollTable("seed", plain, "y", {}, undefined, new Set(["built"]));

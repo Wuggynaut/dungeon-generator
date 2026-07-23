@@ -1,5 +1,6 @@
 import type {Detail, Overrides, Roll, Slot, Subtables, Table} from "../types/rollTypes.ts";
 import {makeChildRng} from "./rng.ts";
+import * as slots from "./slots.ts";
 import {resolveColumn, subtableFor, columnOptions, columnIsTagged, type TaggedOption} from "./data/columnSources.ts";
 
 const MAX_REROLL_TRIES = 50;
@@ -10,7 +11,7 @@ function rolledFromList(
     slotId: string,
     count: number,
 ): string {
-    const label = count > 0 ? `${slotId}#${count}` : slotId;
+    const label = slots.reroll(slotId, count);
     const rng = makeChildRng(seed, label);
 
     if (count === 0) {
@@ -60,7 +61,7 @@ function weightedPickWithCount(seed: string, values: string[], weights: number[]
     if (count === 0) return weightedPick(seed, values, weights, slotId);
     const previous = weightedPickWithCount(seed, values, weights, slotId, count - 1);
     for (let t = 0; t < MAX_REROLL_TRIES; t++) {
-        const candidate = weightedPick(seed, values, weights, `${slotId}#${count}.${t}`);
+        const candidate = weightedPick(seed, values, weights, slots.rerollTry(slotId, count, t));
         if (candidate !== previous) return candidate;
     }
     return previous;
@@ -77,9 +78,12 @@ export function selectTagged(
     const override = overrides[slotId];
     if (override?.editValue !== undefined) return { id: slotId, value: override.editValue };
 
-    const pool = context
+    const eligible = context
         ? options.filter(o => (o.requires ?? []).every(t => context.has(t)))
         : options;
+    // If `requires` filtered everything out, fall back to the full option list
+    // rather than emitting an empty value.
+    const pool = eligible.length > 0 ? eligible : options;
     if (pool.length === 0) return { id: slotId, value: "" };
 
     const values = pool.map(o => o.value);
@@ -130,7 +134,7 @@ export function rollTable(
 ): Roll {
     const columns = table.columns.map(c => c.label);
     const cells = table.columns.map((c, i) => {
-        const slotId = `${baseId}.col.${i}`;
+        const slotId = slots.col(baseId, i);
         return context && columnIsTagged(c.values)
             ? selectTagged(seed, columnOptions(c.values), context, slotId, overrides)
             : rollOne(seed, resolveColumn(c.values), slotId, overrides);
@@ -142,7 +146,7 @@ export function rollTable(
         const id = subtableFor(c.values, cells[i].value);
         const child = id ? subtables[id] : undefined;
         return child
-            ? rollTable(seed, child, `${baseId}.col.${i}.sub`, overrides, subtables)
+            ? rollTable(seed, child, slots.subBase(baseId, i), overrides, subtables)
             : null;
     });
     if (subrolls.every(s => s === null)) return { columns, cells };
